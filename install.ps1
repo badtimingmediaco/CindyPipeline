@@ -161,14 +161,27 @@ Step "Installing the Reel Factory plugin"
 
 if (Has 'claude') {
     Run { claude plugin marketplace add badtimingmediaco/CindyPipeline } | Out-Null
-    Ok "marketplace added"
+    # Refresh the marketplace, then install AND update.
+    #
+    # 'plugin install' is a no-op when the plugin is already present, so re-running this
+    # installer would never pick up a new version - an editor would sit on whatever they
+    # first installed forever. 'marketplace update' re-reads the repo and 'plugin update'
+    # (which needs the FULLY QUALIFIED name@marketplace - the bare name reports "not
+    # found") pulls the new version. Running both makes this line work for a first install
+    # and for an upgrade, which is what people will actually paste.
+    Run { claude plugin marketplace update cindy-reel-factory } | Out-Null
     Run { claude plugin install reel-factory@cindy-reel-factory } | Out-Null
-    # Judge by what landed on disk, not by an exit code.
-    $installed = Get-ChildItem "$env:USERPROFILE\.claude\plugins\cache" -Recurse -Filter 'SKILL.md' `
-                   -ErrorAction SilentlyContinue |
-                 Where-Object { $_.FullName -like '*reel-factory*' } | Select-Object -First 1
-    if ($installed) { Ok "plugin installed" } else { Bad "plugin install failed" }
+    Run { claude plugin update  reel-factory@cindy-reel-factory } | Out-Null
+    Ok "marketplace added and plugin up to date"
 } else { Bad "the claude CLI is not available, so the plugin cannot be installed" }
+
+# Newest cached version wins - an upgrade leaves the old version dir in place beside it.
+$script:PluginDir = Get-ChildItem "$env:USERPROFILE\.claude\plugins\cache\cindy-reel-factory\reel-factory" `
+                      -Directory -ErrorAction SilentlyContinue |
+                    Sort-Object { try { [version]$_.Name } catch { [version]'0.0.0' } } |
+                    Select-Object -Last 1
+if ($script:PluginDir) { Ok "plugin v$($script:PluginDir.Name) ready" }
+else { Bad "plugin install failed - nothing in the plugin cache" }
 
 # ---------------------------------------------------------------- 5. fonts
 Step "Installing fonts"
@@ -176,12 +189,8 @@ Step "Installing fonts"
 # Poppins is OFL-licensed, so it ships with the kit and installs per-user: copy the file
 # and register it under HKCU. No admin rights needed, and it is exactly where the doctor
 # looks. MADE Awelier is licensed personal-use and is NOT redistributed - see below.
-$pluginRoot = Get-ChildItem "$env:USERPROFILE\.claude\plugins\cache" -Recurse -Filter 'plugin.json' `
-                -ErrorAction SilentlyContinue |
-              Where-Object { $_.FullName -like '*reel-factory*' } |
-              Select-Object -First 1
 $fontSrc = $null
-if ($pluginRoot) { $fontSrc = Join-Path $pluginRoot.Directory.Parent.FullName 'kit\fonts' }
+if ($script:PluginDir) { $fontSrc = Join-Path $script:PluginDir.FullName 'kit\fonts' }
 
 if ($fontSrc -and (Test-Path $fontSrc)) {
     $dst = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"

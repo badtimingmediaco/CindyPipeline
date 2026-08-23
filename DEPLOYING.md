@@ -43,7 +43,19 @@ but say this out loud if an editor looks confused.
 
 ## Shipping an update
 
-Editors get updates by re-running the install command; nothing is version-pinned.
+Editors update by re-running the same one-liner they installed with:
+
+```powershell
+irm https://raw.githubusercontent.com/badtimingmediaco/CindyPipeline/main/install.ps1 | iex
+```
+
+**`claude plugin install` alone will NOT update them.** It is a no-op when the plugin is
+already present, so an editor who re-ran only that would sit on their first-installed
+version forever. The installer therefore runs `marketplace update` and `plugin update`
+too. `plugin update` needs the fully qualified `reel-factory@cindy-reel-factory` - the
+bare plugin name reports "not found".
+
+Updates need a Claude Code restart to take effect. Tell editors that when you ship one.
 
 ```bash
 git add -A && git commit -m "..." && git push
@@ -52,10 +64,10 @@ git add -A && git commit -m "..." && git push
 Bump `version` in `.claude-plugin/plugin.json` when the change is worth an editor
 noticing — a new rule, a changed default, a fixed bug that altered output.
 
-**Kit assets are copied into each editor's pipeline at setup, not symlinked.** So pushing
-a new meme or SFX file does not reach anyone who has already run setup. They need
-`/reel-factory:reel-setup` again — it is additive and will copy in anything new without touching their
-own work. Say so explicitly when you ship new assets.
+**Kit assets are copied into each editor's pipeline at setup, not symlinked.** So a new meme
+or SFX file reaches their plugin cache on update but not their working folder. They need
+`/reel-factory:reel-setup` again — it is additive and copies in anything new without
+touching their own work. Say so explicitly when you ship new assets.
 
 ## What is deliberately NOT in here
 
