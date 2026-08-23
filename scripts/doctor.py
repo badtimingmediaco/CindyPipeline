@@ -136,7 +136,14 @@ def default_drafts_dirs():
     if WIN:
         return [os.path.join(LOCALAPPDATA, "CapCut Drafts"),
                 os.path.join(LOCALAPPDATA, "CapCut", "User Data", "Projects", "com.lveditor.draft")]
-    return [os.path.join(HOME, "Movies", "CapCut", "User Data", "Projects", "com.lveditor.draft")]
+    if sys.platform == "darwin":
+        return [os.path.join(HOME, "Movies", "CapCut", "User Data",
+                             "Projects", "com.lveditor.draft")]
+    # Linux has no CapCut at all. Returning the macOS path here made the failure read
+    # "looked in /root/Movies/CapCut/..." - which implies we think this is a Mac and sends
+    # the reader hunting for a missing folder instead of the real cause, that CapCut cannot
+    # exist on this machine. environment_verdict() should have stopped us long before here.
+    return []
 
 
 def looks_like_drafts_dir(d):
