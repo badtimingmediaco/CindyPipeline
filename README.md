@@ -35,7 +35,23 @@ fails with *"Host key verification failed"* even though this repo needs no crede
 all. That line tells git to use HTTPS instead. It is safe, it is one-time, and it does not
 affect repos you already clone over SSH.
 
-Then:
+Then install the plugin. **Which route you use depends on how you run Claude Code:**
+
+**In the Claude desktop app** — type these as slash commands in the chat input, not in a
+terminal. The desktop app has no `claude` CLI, so the terminal version below will just say
+`command not found`.
+
+```
+/plugin marketplace add badtimingmediaco/CindyPipeline
+```
+
+```
+/plugin
+```
+
+The second one opens the plugin browser; pick **reel-factory** and install it.
+
+**In a terminal**, if you have the standalone CLI installed:
 
 ```bash
 claude plugin marketplace add badtimingmediaco/CindyPipeline
@@ -99,7 +115,7 @@ it it can install for you if you ask.
 | | |
 |---|---|
 | **CapCut desktop** | Any modern version. If CapCut is blocked in your region: paid VPN, desktop app, one server, never switched mid-session. |
-| **Claude Code** | Logged in with your own subscription. |
+| **Claude Code** | Logged in with your own subscription. The desktop app is fine — but see the note below about Node. |
 | **Node.js** + `capcut-cli` | `npm i -g capcut-cli` |
 | **Python 3** + `faster-whisper`, `pillow` | `pip install faster-whisper pillow` |
 | **ffmpeg** | `winget install Gyan.FFmpeg` |
@@ -108,6 +124,12 @@ it it can install for you if you ask.
 
 **Windows only for now.** The scripts have POSIX branches so they do not crash on a Mac,
 but macOS is not supported yet.
+
+**Installing the plugin is not the same as being ready to build.** The desktop app can
+install the plugin on its own, but the pipeline itself shells out to Python, ffmpeg and
+`capcut-cli` — and `capcut-cli` needs Node. A fresh Windows machine usually has none of
+them. `/reel-factory:reel-setup` will list exactly what is missing; install those, then run
+it again.
 
 ### The one step nobody can automate
 

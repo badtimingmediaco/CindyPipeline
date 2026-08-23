@@ -87,23 +87,27 @@ Almost every failure is one of these, in rough order of likelihood:
    version and the container is discarded at session end. Setup now refuses up front rather
    than unpacking the kit first. Tell them to install Claude Code on the Windows machine
    where they edit and run it there.
-2. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
+2. **`claude: command not found` when adding the marketplace.** They are in the Claude
+   desktop app, which has no standalone `claude` CLI. The app route is the slash command
+   `/plugin marketplace add badtimingmediaco/CindyPipeline`, then `/plugin` to install.
+   Only a machine with the standalone CLI can use the `claude plugin ...` terminal form.
+3. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
    instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
    they have not restarted Claude Code since installing. Plugins load once at startup, and
    resuming the same conversation does not reload them; it must be a new session.
-3. **CapCut was open during a write.** The single most common cause of a broken draft.
+4. **CapCut was open during a write.** The single most common cause of a broken draft.
    Have them close it and run `python _state/post_session_fix.py "<draft folder>"`.
-4. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
+5. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
    clones plugins over SSH even for a public repo, and a machine with no GitHub key fails
    with "Host key verification failed".
-5. **A font is missing or misnamed.** Awelier must be installed as
+6. **A font is missing or misnamed.** Awelier must be installed as
    `MADE Awelier PERSONAL USE`. Per-user installs are fine and are what the doctor looks
    for.
-6. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
-7. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
+7. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
+8. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
    link in the chain broke.
 
-`python _state/doctor.py` catches 1, 3, 5 and 6 outright. Ask for its full output before
+`python _state/doctor.py` catches 1, 4, 6 and 7 outright. Ask for its full output before
 theorising.
 
 ## The thing worth protecting
