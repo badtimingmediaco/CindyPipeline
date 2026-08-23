@@ -87,10 +87,11 @@ Almost every failure is one of these, in rough order of likelihood:
    version and the container is discarded at session end. Setup now refuses up front rather
    than unpacking the kit first. Tell them to install Claude Code on the Windows machine
    where they edit and run it there.
-2. **`claude: command not found` when adding the marketplace.** They are in the Claude
-   desktop app, which has no standalone `claude` CLI. The app route is the slash command
-   `/plugin marketplace add badtimingmediaco/CindyPipeline`, then `/plugin` to install.
-   Only a machine with the standalone CLI can use the `claude plugin ...` terminal form.
+2. **`claude: command not found`, or `/plugin isn't available in this environment`.** They
+   are trying to install from the Claude desktop app. It cannot do it — no `claude` CLI, and
+   `/plugin` is not offered there either. There is no app-only route. They must install
+   Node, then `npm install -g @anthropic-ai/claude-code`, and add the marketplace from
+   PowerShell. Node is needed for `capcut-cli` anyway, so nothing is wasted.
 3. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
    instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
    they have not restarted Claude Code since installing. Plugins load once at startup, and

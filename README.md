@@ -21,37 +21,45 @@ folder and say *"run it"*.
 
 ## Install
 
-You need [Claude Code](https://claude.com/claude-code), logged in with your own
-subscription, and **git**.
+> **Use the Claude Code CLI in a terminal — PowerShell.**
+>
+> Not the Claude desktop app on its own. The app cannot add a plugin marketplace: it has no
+> `claude` CLI (`command not found`) and `/plugin` reports *"isn't available in this
+> environment"*. This is not a workaround you can skip.
+>
+> You also need Node, Python and ffmpeg for the pipeline itself no matter what, so
+> installing the CLI costs you nothing extra.
 
-First, one line — run it even though this repo is public:
+### 1. The toolchain
+
+Install these first. A fresh Windows machine has none of them.
+
+- **[Node.js](https://nodejs.org)** — needed by `capcut-cli` *and* by the Claude Code CLI
+- **[Python 3](https://python.org)** — tick "Add python.exe to PATH" in the installer
+- **ffmpeg** — `winget install Gyan.FFmpeg`
+
+Close and reopen PowerShell afterwards so `PATH` picks them up.
+
+### 2. The Claude Code CLI
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Then run `claude` once and log in with your own subscription.
+
+### 3. One git setting
 
 ```bash
 git config --global url."https://github.com/".insteadOf git@github.com:
 ```
 
-Claude Code clones plugins over SSH. If you have no GitHub SSH key set up, the install
-fails with *"Host key verification failed"* even though this repo needs no credentials at
-all. That line tells git to use HTTPS instead. It is safe, it is one-time, and it does not
-affect repos you already clone over SSH.
+Claude Code clones plugins over SSH. With no GitHub SSH key set up, the install fails with
+*"Host key verification failed"* even though this repo needs no credentials at all. That
+line tells git to use HTTPS instead. It is one-time, and it does not affect repos you
+already clone over SSH.
 
-Then install the plugin. **Which route you use depends on how you run Claude Code:**
-
-**In the Claude desktop app** — type these as slash commands in the chat input, not in a
-terminal. The desktop app has no `claude` CLI, so the terminal version below will just say
-`command not found`.
-
-```
-/plugin marketplace add badtimingmediaco/CindyPipeline
-```
-
-```
-/plugin
-```
-
-The second one opens the plugin browser; pick **reel-factory** and install it.
-
-**In a terminal**, if you have the standalone CLI installed:
+### 4. The plugin
 
 ```bash
 claude plugin marketplace add badtimingmediaco/CindyPipeline
@@ -64,9 +72,11 @@ claude plugin install reel-factory@cindy-reel-factory
 That pulls down the whole kit — the SFX bank, the meme bank, the logos, the CapCut
 template, the placement laws, the scripts.
 
-**Now fully quit Claude Code and start it again.** Plugins are loaded once, at startup, so
-a plugin you just installed does not exist in the session you installed it from. Resuming
-the same conversation is not enough — it has to be a new session.
+### 5. Restart, then set up
+
+**Fully quit Claude Code and start it again.** Plugins are loaded once, at startup, so a
+plugin you just installed does not exist in the session you installed it from. Resuming the
+same conversation is not enough — it has to be a new session.
 
 Then run:
 
@@ -115,7 +125,7 @@ it it can install for you if you ask.
 | | |
 |---|---|
 | **CapCut desktop** | Any modern version. If CapCut is blocked in your region: paid VPN, desktop app, one server, never switched mid-session. |
-| **Claude Code** | Logged in with your own subscription. The desktop app is fine — but see the note below about Node. |
+| **Claude Code CLI** | `npm install -g @anthropic-ai/claude-code`, logged in with your own subscription. The desktop app alone cannot install the plugin. |
 | **Node.js** + `capcut-cli` | `npm i -g capcut-cli` |
 | **Python 3** + `faster-whisper`, `pillow` | `pip install faster-whisper pillow` |
 | **ffmpeg** | `winget install Gyan.FFmpeg` |
@@ -125,11 +135,9 @@ it it can install for you if you ask.
 **Windows only for now.** The scripts have POSIX branches so they do not crash on a Mac,
 but macOS is not supported yet.
 
-**Installing the plugin is not the same as being ready to build.** The desktop app can
-install the plugin on its own, but the pipeline itself shells out to Python, ffmpeg and
-`capcut-cli` — and `capcut-cli` needs Node. A fresh Windows machine usually has none of
-them. `/reel-factory:reel-setup` will list exactly what is missing; install those, then run
-it again.
+**Installing the plugin is not the same as being ready to build.** The pipeline shells out
+to Python, ffmpeg and `capcut-cli`, and a fresh Windows machine has none of them.
+`/reel-factory:reel-setup` lists exactly what is missing; install those, then run it again.
 
 ### The one step nobody can automate
 
