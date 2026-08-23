@@ -61,6 +61,26 @@ those files live inside CapCut, not on disk.
 
 That's it. You're ready to build.
 
+## How this works day to day
+
+**You do not edit in PowerShell.** PowerShell is only where you *talk to Claude* — it
+replaces the chat window, not CapCut. You still edit in CapCut exactly as you always have,
+and that is still where you will spend most of your time.
+
+| Where | What you do |
+|---|---|
+| **File Explorer** | Drop your MP4 into `Documents\CindyPipeline\01_intake\` |
+| **PowerShell** — run `claude` | Say `run it <name>`. It analyses, plans and builds the draft. **CapCut must be closed while it works.** |
+| **CapCut** | Open the new `CZ_...` draft. Polish, run auto-captions, colour grade, export. |
+| **PowerShell** | `/reel-factory:reel-learn` — tell it what you changed by hand |
+
+One rule ties those together: **CapCut closed while Claude is building, open once it is
+done.** CapCut never re-reads from disk while it is open, so its next autosave would
+overwrite everything Claude just built.
+
+> The Claude **desktop app** cannot run this — it has no way to install or see plugins.
+> Use `claude` in PowerShell. That is the only place the commands exist.
+
 ## Use
 
 Drop an MP4 into `01_intake/` and say:
