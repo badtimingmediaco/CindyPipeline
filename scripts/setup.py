@@ -30,7 +30,7 @@ import doctor  # noqa: E402  - reuse its detection rather than re-implementing i
 
 SKELETON = ["01_intake", "02_transcripts", "03_plans", "04_assets/graphics",
             "04_assets/logos", "04_assets/memes/bank", "04_assets/screenrecs",
-            "04_assets/posters", "05_output", "_state/card_templates", "_backups",
+            "05_output", "_state/card_templates", "_state/learnings", "_backups",
             "_runs", "_sfx/Cindiezhu sfx"]
 
 # (source under kit/, destination under the pipeline home)
