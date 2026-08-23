@@ -21,76 +21,45 @@ folder and say *"run it"*.
 
 ## Install
 
-> **Use the Claude Code CLI in a terminal — PowerShell.**
->
-> Not the Claude desktop app on its own. The app cannot add a plugin marketplace: it has no
-> `claude` CLI (`command not found`) and `/plugin` reports *"isn't available in this
-> environment"*. This is not a workaround you can skip.
->
-> You also need Node, Python and ffmpeg for the pipeline itself no matter what, so
-> installing the CLI costs you nothing extra.
+**Open PowerShell and paste this one line.** Nothing else.
 
-### 1. The toolchain
-
-Install these first. A fresh Windows machine has none of them.
-
-- **[Node.js](https://nodejs.org)** — needed by `capcut-cli` *and* by the Claude Code CLI
-- **[Python 3](https://python.org)** — tick "Add python.exe to PATH" in the installer
-- **ffmpeg** — `winget install Gyan.FFmpeg`
-
-Close and reopen PowerShell afterwards so `PATH` picks them up.
-
-### 2. The Claude Code CLI
-
-```bash
-npm install -g @anthropic-ai/claude-code
+```powershell
+irm https://raw.githubusercontent.com/badtimingmediaco/CindyPipeline/main/install.ps1 | iex
 ```
 
-Then run `claude` once and log in with your own subscription.
+Press enter and leave it. It takes a few minutes and asks you nothing.
 
-### 3. One git setting
+It installs git, Node, Python, ffmpeg, `capcut-cli`, the Claude Code CLI, the Poppins font
+and the plugin itself — skipping anything you already have. Then it tells you the two
+things left to do.
 
-```bash
-git config --global url."https://github.com/".insteadOf git@github.com:
-```
+<details>
+<summary>To open PowerShell: press <b>Win</b>, type <code>powershell</code>, hit enter.</summary>
 
-Claude Code clones plugins over SSH. With no GitHub SSH key set up, the install fails with
-*"Host key verification failed"* even though this repo needs no credentials at all. That
-line tells git to use HTTPS instead. It is one-time, and it does not affect repos you
-already clone over SSH.
+You don't need to "run as administrator" — everything installs for your user only.
 
-### 4. The plugin
+If the installer stops with problems listed, close the window, open a **new** PowerShell,
+and paste the same line again. Most failures are just Windows not having noticed a newly
+installed program yet, and a second run clears them.
 
-```bash
-claude plugin marketplace add badtimingmediaco/CindyPipeline
-```
+</details>
 
-```bash
-claude plugin install reel-factory@cindy-reel-factory
-```
+### Then, two things
 
-That pulls down the whole kit — the SFX bank, the meme bank, the logos, the CapCut
-template, the placement laws, the scripts.
-
-### 5. Restart, then set up
-
-**Fully quit Claude Code and start it again.** Plugins are loaded once, at startup, so a
-plugin you just installed does not exist in the session you installed it from. Resuming the
-same conversation is not enough — it has to be a new session.
-
-Then run:
+**1.** Open a new terminal, run `claude`, and type:
 
 ```
 /reel-factory:reel-setup
 ```
 
-> **If you get `Unknown command: /reel-setup`** — you dropped the prefix. Every command
-> here is namespaced by the plugin, so it is `/reel-factory:reel-setup`, not
-> `/reel-setup`. Type `/reel` and let the menu complete it.
+That builds your pipeline folder, finds your CapCut drafts folder wherever it is, and
+places the house template. It tells you if anything is still missing.
 
-It builds your pipeline folder, finds your CapCut drafts directory (including a custom
-one), places the template, and tells you exactly what is missing. Fix what it flags and
-re-run — it is safe to run as many times as you like.
+**2.** Open `CZ_TEMPLATE` in CapCut once, **while online**, then close it. CapCut downloads
+its own fonts and the torn-paper effect at that moment. Nobody can automate this part —
+those files live inside CapCut, not on disk.
+
+That's it. You're ready to build.
 
 ## Use
 
@@ -117,27 +86,26 @@ That is the loop that makes the next build better. Use it every time.
 
 ---
 
-## What you need on your machine first
+## What the installer sets up for you
 
-`/reel-factory:reel-setup` checks all of this and tells you what to do about anything missing. Most of
-it it can install for you if you ask.
+You do not need to install any of this by hand — `install.ps1` does it. This is here so you
+know what is on your machine, and what to do if a piece ever breaks.
 
 | | |
 |---|---|
 | **CapCut desktop** | Any modern version. If CapCut is blocked in your region: paid VPN, desktop app, one server, never switched mid-session. |
-| **Claude Code CLI** | `npm install -g @anthropic-ai/claude-code`, logged in with your own subscription. The desktop app alone cannot install the plugin. |
+| **Claude Code CLI** | Installed for you. You log in once with your own subscription. The Claude *desktop app* alone cannot install plugins — it has no `claude` CLI and no `/plugin` command — which is why the installer sets up the terminal CLI. |
 | **Node.js** + `capcut-cli` | `npm i -g capcut-cli` |
 | **Python 3** + `faster-whisper`, `pillow` | `pip install faster-whisper pillow` |
 | **ffmpeg** | `winget install Gyan.FFmpeg` |
-| **Poppins** | Free, Google Fonts. Per-user install is fine. |
-| **MADE Awelier** | You install this one yourself — it is licensed personal-use, so it is not redistributed here. Its installed family name is `MADE Awelier PERSONAL USE`. |
+| **Poppins** | Ships with the kit (OFL-licensed) and is registered for you automatically. |
+| **MADE Awelier** | **The one thing you install by hand.** Licensed personal-use, so it cannot ship in a public repo. Download it, select the `.otf` files, right-click → Install. The family name must read `MADE Awelier PERSONAL USE`. |
 
 **Windows only for now.** The scripts have POSIX branches so they do not crash on a Mac,
 but macOS is not supported yet.
 
-**Installing the plugin is not the same as being ready to build.** The pipeline shells out
-to Python, ffmpeg and `capcut-cli`, and a fresh Windows machine has none of them.
-`/reel-factory:reel-setup` lists exactly what is missing; install those, then run it again.
+If anything is missing or broken later, `/reel-factory:reel-setup` names it precisely, and
+re-running the installer line fixes most of it.
 
 ### The one step nobody can automate
 
