@@ -12,7 +12,20 @@ folder and say *"run it"*.
 ## Install
 
 You need [Claude Code](https://claude.com/claude-code), logged in with your own
-subscription. Then, once:
+subscription, and **git**.
+
+First, one line — run it even though this repo is public:
+
+```bash
+git config --global url."https://github.com/".insteadOf git@github.com:
+```
+
+Claude Code clones plugins over SSH. If you have no GitHub SSH key set up, the install
+fails with *"Host key verification failed"* even though this repo needs no credentials at
+all. That line tells git to use HTTPS instead. It is safe, it is one-time, and it does not
+affect repos you already clone over SSH.
+
+Then:
 
 ```bash
 claude plugin marketplace add cindyzhu/cindy-reel-factory
