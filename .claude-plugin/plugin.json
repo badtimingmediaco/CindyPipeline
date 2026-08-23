@@ -1,0 +1,24 @@
+{
+	"$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+	"name": "reel-factory",
+	"displayName": "Cindy Zhu Reel Factory",
+	"version": "4.0.0",
+	"description": "Turns one descripted talking-head MP4 into a near-finished CapCut draft — title, torn-paper stickers, memes, logos, fabricated cards, SFX and CTA — then proves the build with scripted assertions before handing it over.",
+	"author": {
+		"name": "Cindy Zhu",
+		"url": "https://cindyzhu.com.au"
+	},
+	"homepage": "https://cindyzhu.com.au",
+	"repository": "https://github.com/cindyzhu/cindy-reel-factory",
+	"license": "UNLICENSED",
+	"keywords": [
+		"capcut",
+		"video",
+		"reels",
+		"short-form",
+		"editing",
+		"automation",
+		"instagram",
+		"tenor"
+	]
+}

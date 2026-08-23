@@ -1,0 +1,17 @@
+# Nothing machine-specific ever ships. Setup regenerates all of this.
+paths.json
+_backups/
+_runs/
+05_output/
+node_modules/
+__pycache__/
+*.pyc
+
+# CapCut writes these into a draft folder; they are machine-bound and regenerate.
+crypto_key_store.dat
+crypto_key_store.dat.bak
+
+# Editor working files
+.DS_Store
+Thumbs.db
+*.tmp.bak

@@ -1,0 +1,293 @@
+{
+  "name": "paper_sticker",
+  "type": "text",
+  "segment": {
+    "id": "E0A6BF58-4264-44bc-B273-3117D9BB7521",
+    "source_timerange": null,
+    "target_timerange": {
+      "start": 0,
+      "duration": 3233333
+    },
+    "render_timerange": {
+      "start": 0,
+      "duration": 0
+    },
+    "desc": "",
+    "state": 0,
+    "speed": 1,
+    "is_loop": false,
+    "is_tone_modify": false,
+    "reverse": false,
+    "intensifies_audio": false,
+    "cartoon": false,
+    "volume": 1,
+    "last_nonzero_volume": 1,
+    "clip": {
+      "scale": {
+        "x": 0.391542627969389,
+        "y": 0.391542627969389
+      },
+      "rotation": 0,
+      "transform": {
+        "x": 0,
+        "y": 0.4356688968921324
+      },
+      "flip": {
+        "vertical": false,
+        "horizontal": false
+      },
+      "alpha": 1
+    },
+    "uniform_scale": {
+      "on": true,
+      "value": 1
+    },
+    "material_id": "58884005-D31E-41d7-88AC-FC9D2E253FC6",
+    "extra_material_refs": [
+      "256FD688-9BED-43b8-8C18-9CEB1FF7A9DE",
+      "E0F7D796-B2CE-4150-8B00-7C118F42CB05"
+    ],
+    "render_index": 14046,
+    "keyframe_refs": [],
+    "enable_lut": false,
+    "enable_adjust": false,
+    "enable_hsl": false,
+    "visible": true,
+    "group_id": "",
+    "enable_color_curves": true,
+    "enable_hsl_curves": true,
+    "track_render_index": 10,
+    "hdr_settings": null,
+    "enable_color_wheels": true,
+    "track_attribute": 0,
+    "is_placeholder": false,
+    "template_id": "",
+    "enable_smart_color_adjust": false,
+    "template_scene": "default",
+    "common_keyframes": [],
+    "caption_info": null,
+    "responsive_layout": {
+      "enable": false,
+      "target_follow": "",
+      "size_layout": 0,
+      "horizontal_pos_layout": 0,
+      "vertical_pos_layout": 0
+    },
+    "enable_color_match_adjust": false,
+    "enable_color_correct_adjust": false,
+    "enable_adjust_mask": false,
+    "raw_segment_id": "",
+    "lyric_keyframes": null,
+    "enable_video_mask": true,
+    "digital_human_template_group_id": "",
+    "color_correct_alg_result": "",
+    "source": "segmentsourcenormal",
+    "enable_mask_stroke": false,
+    "enable_mask_shadow": false,
+    "enable_color_adjust_pro": false
+  },
+  "material": {
+    "type": "text_templates",
+    "data": {
+      "id": "58884005-D31E-41d7-88AC-FC9D2E253FC6",
+      "version": "1.0.0",
+      "effect_id": "7602106273437371701",
+      "resource_id": "7602106273437371701",
+      "third_resource_id": "",
+      "name": "A day in my life",
+      "type": "text_template",
+      "path": "C:/Users/anayk/AppData/Local/CapCut/User Data/Cache/artistEffect/7602106273437371701/51f8c5cff350e7fb5cf543fa1ce96655",
+      "category_id": "100001",
+      "category_name": "Text template",
+      "platform": "all",
+      "text_to_audio_ids": [],
+      "source_platform": 1,
+      "resources": [
+        {
+          "panel": "fonts",
+          "path": "C:/Users/anayk/AppData/Local/CapCut/User Data/Cache/effect/7525275079106776337/2ba37dbfb9188bff33ee388a1493d22f/font.ttf",
+          "resource_id": "7525275079106776337",
+          "source_platform": 1
+        },
+        {
+          "panel": "flower",
+          "path": "C:/Users/anayk/AppData/Local/CapCut/User Data/Cache/effect/7576555463085493557/336edfef6c9747921185f15d838c54c9",
+          "resource_id": "7576555463085493557",
+          "source_platform": 1
+        },
+        {
+          "panel": "text",
+          "path": "C:/Users/anayk/AppData/Local/CapCut/User Data/Cache/effect/6790246693674684942/383dabd75d7fe7985d990ebb34d63732",
+          "resource_id": "6790246693674684942",
+          "source_platform": 1
+        }
+      ],
+      "formula_id": "",
+      "text_info_resources": [
+        {
+          "id": "5EC8FDEA-4891-4764-87DC-7DD4A5F22CAC",
+          "attach_info": {
+            "start_time": 0,
+            "duration": 3233332,
+            "original_size_width": 394.6457824707031,
+            "original_size_height": 110.83332824707033,
+            "clip": {
+              "scale": {
+                "x": 2.43950667923531,
+                "y": 2.43950667923531
+              },
+              "rotation": 0,
+              "transform": {
+                "x": 0,
+                "y": 0
+              },
+              "flip": {
+                "vertical": false,
+                "horizontal": false
+              },
+              "alpha": 1
+            }
+          },
+          "text_material_id": "CEE1FED8-F47C-40e9-9712-3C476E578211",
+          "extra_material_refs": [
+            "E0F7D796-B2CE-4150-8B00-7C118F42CB05",
+            "256FD688-9BED-43b8-8C18-9CEB1FF7A9DE"
+          ],
+          "clip_type": "",
+          "lyric_keyframes": [],
+          "word_index": [],
+          "order_in_layer": 0,
+          "capital": ""
+        }
+      ],
+      "non_text_info_resources": [],
+      "check_flag": 7,
+      "text_template_preset_resource_id": "",
+      "is_3d": false,
+      "is_pre_rendered": false,
+      "aigc_type": "none",
+      "text_template_resource_type": "text_template",
+      "aigc_config": {
+        "prompt": "",
+        "seed": 0,
+        "model": "",
+        "font_item": {
+          "id": "594A6EB4-2737-4125-B4B8-079003217CD1",
+          "resource_id": "",
+          "third_resource_id": "",
+          "category_id": "",
+          "category_name": "",
+          "source_platform": 0,
+          "path": "",
+          "effect_id": "",
+          "title": "",
+          "team_id": "",
+          "file_uri": "",
+          "request_id": ""
+        }
+      },
+      "request_id": "",
+      "origin_word_info": {
+        "text": "",
+        "start_time": 0,
+        "end_time": 0,
+        "words": [],
+        "keyword_ranges": []
+      },
+      "current_word_info": {
+        "text": "",
+        "start_time": 0,
+        "end_time": 0,
+        "words": [],
+        "keyword_ranges": []
+      },
+      "is_dynamic_build": false,
+      "is_ai_emoji": false,
+      "is_lyric_effect": false,
+      "lyric_group_id": "",
+      "merge_content": "",
+      "is_uneven_animation": false,
+      "material_text_ranges": [],
+      "ai_emoji_config": null
+    }
+  },
+  "extra_materials": [
+    {
+      "type": "material_animations",
+      "data": {
+        "id": "256FD688-9BED-43b8-8C18-9CEB1FF7A9DE",
+        "type": "sticker_animation",
+        "animations": [
+          {
+            "id": "",
+            "type": "loop",
+            "start": 0,
+            "duration": 500000,
+            "path": "C:/Users/anayk/AppData/Local/CapCut/User Data/Cache/effect/6790246693674684942/383dabd75d7fe7985d990ebb34d63732",
+            "platform": "all",
+            "resource_id": "6790246693674684942",
+            "third_resource_id": "",
+            "source_platform": 1,
+            "name": "",
+            "category_id": "",
+            "category_name": "",
+            "panel": "",
+            "material_type": "sticker",
+            "anim_adjust_params": null,
+            "request_id": ""
+          }
+        ],
+        "multi_language_current": "none"
+      }
+    },
+    {
+      "type": "effects",
+      "data": {
+        "id": "E0F7D796-B2CE-4150-8B00-7C118F42CB05",
+        "effect_id": "",
+        "resource_id": "7576555463085493557",
+        "third_resource_id": "",
+        "name": "",
+        "report_name": "",
+        "type": "text_effect",
+        "sub_type": "none",
+        "path": "C:/Users/anayk/AppData/Local/CapCut/User Data/Cache/effect/7576555463085493557/336edfef6c9747921185f15d838c54c9",
+        "value": 0,
+        "visible": true,
+        "item_effect_type": 0,
+        "category_id": "",
+        "category_name": "",
+        "category_key": "",
+        "sub_category_id": "",
+        "sub_category_name": "",
+        "platform": "all",
+        "apply_target_type": 0,
+        "source_platform": 1,
+        "version": "",
+        "adjust_params": [],
+        "time_range": null,
+        "formula_id": "",
+        "enable_skin_tone_correction": false,
+        "algorithm_artifact_path": "",
+        "intensity_key": "",
+        "face_adjust_params": [],
+        "exclusion_group": [],
+        "panel_id": "",
+        "bloom_params": null,
+        "request_id": "",
+        "color_match_info": null,
+        "multi_language_current": "",
+        "lumi_hub_path": "",
+        "covering_relation_change": 0,
+        "beauty_face_auto_preset_id": "",
+        "beauty_body_auto_preset_id": "",
+        "beauty_face_auto_retouch_info": {
+          "face_id": [],
+          "beauty_face_auto_retouch_id": ""
+        },
+        "smart_color_mode": 0,
+        "is_from_intelligent_quality": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# Every file in this repo must land on the editor's machine byte-identical.
+# CapCut draft internals, the donor JSONs and the sticker kit are matched by hash at
+# setup; any EOL translation would break that check and can corrupt a draft.
+# Disable ALL text conversion repo-wide. Do not remove this.
+* -text
