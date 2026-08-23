@@ -90,7 +90,7 @@ All in `_state/` after setup. Import them; do not re-derive what they encode.
 |---|---|
 | `house_layout.py` | **The placement laws**, measured off her own hand-finished edits. `meme_geom()`, `card_geom()`, `place_sticker()`, the annotation sticker kit. Never hand-type a scale or transform — call these. |
 | `verify_build.py` | The scripted assertions. The build's gate. |
-| `tenor_fetch.py` | Meme sourcing from Tenor, no API key, MP4 only — never the .gif. |
+| `tenor_fetch.py` | Meme sourcing from Tenor, no API key, MP4 only — never the .gif. Run `--selftest` first, or whenever a slot comes back empty: it separates "Tenor changed its markup" from "that query has nothing" from "no internet", which look identical from inside a build. |
 | `resolve_input.py` | Fuzzy intake filename matching. |
 | `doctor.py` | Stage 0. |
 | `post_session_fix.py` | Waits for CapCut to exit, then re-grafts and re-checks. Run after every CapCut open. |
