@@ -78,6 +78,31 @@ def py_module(mod):
 
 # --------------------------------------------------------------------------- CapCut
 
+def environment_verdict():
+    """Can this machine host the pipeline at all? -> (ok, explanation).
+
+    The pipeline drives CapCut *desktop*, which ships only for Windows and macOS, and it
+    writes into a local drafts folder that CapCut then opens. A Linux box - in practice a
+    cloud/web Claude Code session - cannot do that, and no amount of installing helps.
+    Checked FIRST so nobody unpacks a 30MB kit into a container that disappears.
+    """
+    if sys.platform.startswith("linux"):
+        cloud = (os.path.exists("/.dockerenv") or HOME in ("/root", "/home/user")
+                 or os.environ.get("CLAUDE_CODE_REMOTE"))
+        return False, (
+            "Linux" + (" (looks like a cloud/web session)" if cloud else "") + ".\n"
+            "CapCut desktop does not exist for Linux, so the pipeline cannot run here.\n"
+            "Run this in Claude Code ON THE COMPUTER WHERE YOU EDIT - the Windows machine\n"
+            "with CapCut installed. Everything else about the kit is fine; it is CapCut\n"
+            "that has to be local, because the build writes into its drafts folder and\n"
+            "you open the result in the app afterwards.")
+    if sys.platform == "darwin":
+        return True, "macOS - CapCut exists here, but this kit is Windows-tested only."
+    if not WIN:
+        return False, f"{sys.platform} - unsupported."
+    return True, "Windows"
+
+
 def capcut_running():
     """The single most important guardrail: CapCut must be closed during any write.
     It never re-reads from disk while open and its next autosave destroys the build."""
@@ -231,6 +256,19 @@ def main():
 
     print("\nSTAGE 0 - DOCTOR")
     print("=" * 68)
+
+    # -- can this machine host the pipeline at all? -------------------------
+    env_ok, env_why = environment_verdict()
+    print("\nEnvironment")
+    check("This machine can run the pipeline", env_ok, env_why, fatal=not env_ok or True)
+    if not env_ok:
+        print("\n" + "=" * 68)
+        print("NOT READY - wrong kind of machine. Nothing below would help.")
+        print("=" * 68 + "\n")
+        if args.json:
+            print(json.dumps({"ready": False, "fails": ["environment"],
+                              "environment": env_why}, indent=2))
+        return 1
 
     # -- toolchain ----------------------------------------------------------
     print("\nToolchain")

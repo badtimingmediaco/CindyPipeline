@@ -140,6 +140,18 @@ def main():
     print("\nREEL FACTORY - SETUP")
     print("=" * 68)
 
+    # Before creating or copying ANYTHING: is this even the right kind of machine?
+    # Unpacking a 30MB kit into a cloud container that vanishes at end of session, and
+    # only then reporting that CapCut is missing, wastes the editor's time and confuses
+    # them about whether the tool is broken. It is not - they are on the wrong computer.
+    env_ok, env_why = doctor.environment_verdict()
+    if not env_ok:
+        say("\n  CANNOT RUN HERE\n")
+        for line in env_why.splitlines():
+            say(f"  {line}")
+        say("")
+        return 2
+
     synced = in_synced_folder(pipe)
     if synced:
         say(f"\n  REFUSING: {pipe} is inside a synced folder ({synced}).")

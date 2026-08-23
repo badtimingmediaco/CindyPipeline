@@ -7,6 +7,16 @@ before handing it over.
 It runs inside **Claude Code**. There is no app to launch and no GUI: you drop a video in a
 folder and say *"run it"*.
 
+> ### Run it on the computer you edit on
+>
+> Not on Claude Code for web, and not in a cloud session. This tool drives **CapCut
+> desktop** — it writes into CapCut's local drafts folder, and you open the result in the
+> app afterwards. Cloud sessions are Linux containers, CapCut has no Linux version, and the
+> container is thrown away at the end of the session anyway.
+>
+> Setup will stop and tell you if you are on the wrong kind of machine. Install Claude Code
+> on your Windows editing machine and run it there.
+
 ---
 
 ## Install

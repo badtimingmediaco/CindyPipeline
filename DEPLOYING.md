@@ -82,6 +82,11 @@ and have `/reel-factory:reel-setup` pull the kit from there. The install stays t
 
 Almost every failure is one of five things, in this order of likelihood:
 
+0. **"CapCut drafts folder not found", on Linux paths like `/root/...`.** They are running
+   it in a cloud/web Claude Code session, not on their editing machine. CapCut has no Linux
+   version and the container is discarded at session end. Setup now refuses up front rather
+   than unpacking the kit first. Tell them to install Claude Code on the Windows machine
+   where they edit and run it there.
 0. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
    instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
    they have not restarted Claude Code since installing. Plugins load once at startup, and
