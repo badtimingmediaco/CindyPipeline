@@ -11,14 +11,14 @@
 			"displayName": "Cindy Zhu Reel Factory",
 			"source": {
 				"source": "github",
-				"repo": "cindyzhu/cindy-reel-factory"
+				"repo": "badtimingmediaco/CindyPipeline"
 			},
 			"description": "Turns a descripted talking-head MP4 into a near-finished CapCut draft: title, torn-paper stickers, memes, logos, cards, SFX and CTA, verified by scripted assertions.",
 			"author": {
 				"name": "Cindy Zhu"
 			},
 			"homepage": "https://cindyzhu.com.au",
-			"repository": "https://github.com/cindyzhu/cindy-reel-factory",
+			"repository": "https://github.com/badtimingmediaco/CindyPipeline",
 			"license": "UNLICENSED",
 			"keywords": ["capcut", "video", "reels", "editing", "automation"],
 			"category": "Design",

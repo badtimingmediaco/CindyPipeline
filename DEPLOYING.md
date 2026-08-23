@@ -9,25 +9,37 @@ For whoever owns the repo. Editors do not need this file — they need `README.m
 The repo is ~29 MB of content. That is comfortably inside a normal git repo; no LFS, no
 release assets, nothing special.
 
-1. Create a **public** repo named `cindy-reel-factory` under the account that will own it.
+1. Create a **public** repo. It lives at **`badtimingmediaco/CindyPipeline`**.
+   Do NOT tick "Add README", ".gitignore" or "license" — this checkout already has all
+   three, and an initialised remote would reject the push.
 2. Point this checkout at it and push:
 
 ```bash
-git remote add origin https://github.com/<owner>/cindy-reel-factory.git
+git remote add origin https://github.com/badtimingmediaco/CindyPipeline.git
 ```
 
 ```bash
 git push -u origin main
 ```
 
-3. **Fix the owner in two manifests.** `.claude-plugin/marketplace.json` and
-   `.claude-plugin/plugin.json` currently say `cindyzhu/cindy-reel-factory`. If the real
-   account is different, the install command in `README.md` and the `repo` field in
-   `marketplace.json` must both match, or `claude plugin install` will clone the wrong
-   place. Change them, commit, push.
+3. **If the repo ever moves**, four places must change together or `claude plugin install`
+   clones the wrong location: the `repo` field in `.claude-plugin/marketplace.json`, the
+   `repository` field in *both* manifests, and the install command in `README.md`.
 
 Then have one editor run through `README.md` start to finish on a clean machine before
 you send it to the other three.
+
+### Two names, deliberately
+
+The repo is **`CindyPipeline`**; the *marketplace* is **`cindy-reel-factory`** (the `name`
+field in `marketplace.json`). That is why the second install command reads
+`reel-factory@cindy-reel-factory` and not the repo name. Renaming the marketplace would
+break every editor who has already added it — leave it alone.
+
+Note too that the repo name collides with the working folder: `CindyPipeline` on GitHub is
+the **tool**, while `Documents\CindyPipeline` on an editor's machine is their **workspace**.
+Nobody clones the repo by hand — the plugin installer puts it under `~/.claude/plugins` —
+but say this out loud if an editor looks confused.
 
 ## Shipping an update
 

@@ -28,7 +28,7 @@ affect repos you already clone over SSH.
 Then:
 
 ```bash
-claude plugin marketplace add cindyzhu/cindy-reel-factory
+claude plugin marketplace add badtimingmediaco/CindyPipeline
 ```
 
 ```bash
