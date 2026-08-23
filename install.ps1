@@ -91,8 +91,23 @@ if (-not (Has 'winget')) {
 }
 Ok "winget available"
 
-$capcut = Test-Path "$env:LOCALAPPDATA\CapCut\CapCut.exe"
-if ($capcut) { Ok "CapCut desktop found" }
+# CapCut has no registry uninstall entry, and its exe may sit at the root of
+# %LOCALAPPDATA%\CapCut, in a VERSION subfolder, under Program Files, or as a Store app.
+# The config file it writes on first run is the most reliable signal that it is really here.
+$capcutWhy = $null
+if (Test-Path "$env:LOCALAPPDATA\CapCut\User Data\Config\globalSetting") {
+    $capcutWhy = 'its config file exists, so it has been installed and run'
+} else {
+    $roots = @("$env:LOCALAPPDATA\CapCut", "$env:LOCALAPPDATA\Programs\CapCut",
+               "$env:ProgramFiles\CapCut", "${env:ProgramFiles(x86)}\CapCut")
+    foreach ($r in $roots) {
+        if (-not (Test-Path $r)) { continue }
+        $exe = Get-ChildItem $r -Filter 'CapCut.exe' -Recurse -Depth 2 -ErrorAction SilentlyContinue |
+               Select-Object -First 1
+        if ($exe) { $capcutWhy = $exe.FullName; break }
+    }
+}
+if ($capcutWhy) { Ok "CapCut desktop found ($capcutWhy)" }
 else {
     Note "CapCut desktop not found. Install it from capcut.com before building a reel."
     Note "Continuing - everything else can still be set up now."

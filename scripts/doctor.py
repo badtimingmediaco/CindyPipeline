@@ -103,6 +103,45 @@ def environment_verdict():
     return True, "Windows"
 
 
+def capcut_installed():
+    """Is CapCut on this machine? -> (yes, evidence).
+
+    One hard-coded exe path is not enough. CapCut has no registry uninstall entry, and its
+    exe may sit at the root of %LOCALAPPDATA%\\CapCut, inside a VERSION subfolder
+    (9.3.0.3970\\CapCut.exe), under Program Files, or as a Store app. A single-path check
+    told an editor with a working CapCut that it was not installed - while the same run had
+    already found their drafts folder, which only CapCut could have created.
+
+    Strongest evidence first: the config file CapCut writes on first run.
+    """
+    gs = os.path.join(LOCALAPPDATA, "CapCut", "User Data", "Config", "globalSetting")
+    if os.path.exists(gs):
+        return True, f"CapCut has run on this machine (its config exists: {gs})"
+
+    roots = [os.path.join(LOCALAPPDATA, "CapCut"),
+             os.path.join(LOCALAPPDATA, "Programs", "CapCut"),
+             os.path.join(os.environ.get("PROGRAMFILES", r"C:\Program Files"), "CapCut"),
+             os.path.join(os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)"), "CapCut")]
+    for root in roots:
+        if not os.path.isdir(root):
+            continue
+        direct = os.path.join(root, "CapCut.exe")
+        if os.path.exists(direct):
+            return True, direct
+        try:                       # version subfolders: 9.3.0.3970\CapCut.exe
+            for name in sorted(os.listdir(root), reverse=True):
+                cand = os.path.join(root, name, "CapCut.exe")
+                if os.path.exists(cand):
+                    return True, cand
+        except OSError:
+            pass
+
+    if os.path.isdir(os.path.join(LOCALAPPDATA, "CapCut")):
+        return True, (f"{os.path.join(LOCALAPPDATA, 'CapCut')} exists but no CapCut.exe was "
+                      "found in it - probably a Store install or an unusual layout")
+    return False, "no CapCut install found in any known location"
+
+
 def capcut_running():
     """The single most important guardrail: CapCut must be closed during any write.
     It never re-reads from disk while open and its next autosave destroys the build."""
@@ -296,13 +335,21 @@ def main():
 
     # -- CapCut itself ------------------------------------------------------
     print("\nCapCut")
-    exe = os.path.join(LOCALAPPDATA, "CapCut", "CapCut.exe")
-    check("CapCut desktop installed", os.path.exists(exe) or not WIN, exe if WIN else "(non-Windows)")
+    cc_ok, cc_why = capcut_installed()
     running = capcut_running()
+    drafts, why = find_drafts_dir(args.drafts)
+
+    # Order matters: a resolved drafts folder is itself proof CapCut is installed, since
+    # nothing else creates one. Never report "CapCut is not installed" in the same run that
+    # found their drafts folder - that contradiction is what makes an editor distrust the
+    # whole report.
+    if drafts and not cc_ok:
+        cc_ok, cc_why = True, f"drafts folder exists, so CapCut created it: {drafts}"
+    check("CapCut desktop installed", cc_ok or not WIN, cc_why if WIN else "(non-Windows)")
+
     check("CapCut is CLOSED (required for every write)", not running,
           "running - close it before any build" if running else "closed")
 
-    drafts, why = find_drafts_dir(args.drafts)
     check("CapCut drafts folder", bool(drafts), why)
     paths["capcut_drafts_dir"] = drafts or None
 
