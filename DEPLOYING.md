@@ -57,12 +57,18 @@ bare plugin name reports "not found".
 
 Updates need a Claude Code restart to take effect. Tell editors that when you ship one.
 
+### Your side of an update
+
+Bump `version` in `.claude-plugin/plugin.json` (and the `version:` line in
+`skills/reel-factory/SKILL.md`, which should match), then:
+
 ```bash
 git add -A && git commit -m "..." && git push
 ```
 
-Bump `version` in `.claude-plugin/plugin.json` when the change is worth an editor
-noticing — a new rule, a changed default, a fixed bug that altered output.
+Bump the version whenever the change is worth an editor noticing — a new rule, a changed
+default, a fixed bug that altered output. The version is what `plugin update` compares, so
+a push without a bump may not reach anyone.
 
 **Kit assets are copied into each editor's pipeline at setup, not symlinked.** So a new meme
 or SFX file reaches their plugin cache on update but not their working folder. They need
