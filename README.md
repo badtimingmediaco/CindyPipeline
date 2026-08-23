@@ -36,11 +36,21 @@ claude plugin install reel-factory@cindy-reel-factory
 ```
 
 That pulls down the whole kit — the SFX bank, the meme bank, the logos, the CapCut
-template, the placement laws, the scripts. Then open Claude Code and run:
+template, the placement laws, the scripts.
+
+**Now fully quit Claude Code and start it again.** Plugins are loaded once, at startup, so
+a plugin you just installed does not exist in the session you installed it from. Resuming
+the same conversation is not enough — it has to be a new session.
+
+Then run:
 
 ```
-/reel-setup
+/reel-factory:reel-setup
 ```
+
+> **If you get `Unknown command: /reel-setup`** — you dropped the prefix. Every command
+> here is namespaced by the plugin, so it is `/reel-factory:reel-setup`, not
+> `/reel-setup`. Type `/reel` and let the menu complete it.
 
 It builds your pipeline folder, finds your CapCut drafts directory (including a custom
 one), places the template, and tells you exactly what is missing. Fix what it flags and
@@ -64,7 +74,7 @@ a loop until the checks pass. You open the result in CapCut and polish.
 When you have polished it, tell it what you changed:
 
 ```
-/reel-learn
+/reel-factory:reel-learn
 ```
 
 That is the loop that makes the next build better. Use it every time.
@@ -73,7 +83,7 @@ That is the loop that makes the next build better. Use it every time.
 
 ## What you need on your machine first
 
-`/reel-setup` checks all of this and tells you what to do about anything missing. Most of
+`/reel-factory:reel-setup` checks all of this and tells you what to do about anything missing. Most of
 it it can install for you if you ask.
 
 | | |
@@ -123,7 +133,7 @@ verification will run.
 
 ```
 skills/reel-factory/    the spec — a router plus reference files loaded on demand
-commands/               /reel-setup, /reel-run, /reel-learn
+commands/               /reel-factory:reel-setup, /reel-factory:reel-run, /reel-factory:reel-learn
 scripts/                doctor, setup, fuzzy input matching, placement laws,
                         verification, Tenor sourcing, post-session repair
 kit/                    SFX bank (23), meme bank (37), logos, graphics,

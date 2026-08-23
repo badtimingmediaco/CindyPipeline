@@ -3,12 +3,12 @@
 > Part of the Cindy Zhu Reel Factory spec (v3.0). Loaded on demand by the
 > `reel-factory` skill - see SKILL.md for the routing table.
 
-**`/reel-setup` now automates all of this** — it installs the kit, places `CZ_TEMPLATE`
+**`/reel-factory:reel-setup` now automates all of this** — it installs the kit, places `CZ_TEMPLATE`
 into this machine's drafts folder, relinks the template's sample audio, and runs the
 doctor. Read this file when a doctor check FAILS and you need to know what the check was
 actually asserting, or when setting up somewhere the scripts do not cover.
 
-Two things `/reel-setup` deliberately does not do: install **MADE Awelier** (licensed
+Two things `/reel-factory:reel-setup` deliberately does not do: install **MADE Awelier** (licensed
 personal-use, so each editor downloads it themselves — installed family name is
 `MADE Awelier PERSONAL USE`), and warm CapCut's effect cache (item 3 below — only opening
 the template in CapCut can do that).

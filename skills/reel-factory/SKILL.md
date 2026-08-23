@@ -1,7 +1,7 @@
 ---
 name: reel-factory
 description: Build a Cindy Zhu reel - turn a descripted talking-head MP4 in 01_intake into a near-finished CapCut draft with title, torn-paper stickers, memes, logos, cards, SFX and CTA. Use when asked to "run it" on a video, build or edit a reel, or fix an existing CZ_ draft.
-version: 4.0.0
+version: 4.0.1
 ---
 
 # Cindy Zhu Reel Factory
@@ -100,5 +100,5 @@ All in `_state/` after setup. Import them; do not re-derive what they encode.
 ## AFTER DELIVERY
 
 Ask the editor what they changed by hand, and record it — that is how this gets better.
-`/reel-learn` runs the loop; `reference/07-rules.md` covers what belongs in a learning
+`/reel-factory:reel-learn` runs the loop; `reference/07-rules.md` covers what belongs in a learning
 entry and what does not.

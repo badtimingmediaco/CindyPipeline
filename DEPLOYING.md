@@ -54,7 +54,7 @@ noticing — a new rule, a changed default, a fixed bug that altered output.
 
 **Kit assets are copied into each editor's pipeline at setup, not symlinked.** So pushing
 a new meme or SFX file does not reach anyone who has already run setup. They need
-`/reel-setup` again — it is additive and will copy in anything new without touching their
+`/reel-factory:reel-setup` again — it is additive and will copy in anything new without touching their
 own work. Say so explicitly when you ship new assets.
 
 ## What is deliberately NOT in here
@@ -76,12 +76,16 @@ hand-written notes and record how she thinks about edits.
 
 If that ever stops being what you want, the split is: keep `scripts/` and the plugin
 scaffolding public, move `kit/` and `skills/reel-factory/reference/` to a private repo,
-and have `/reel-setup` pull the kit from there. The install stays two commands.
+and have `/reel-factory:reel-setup` pull the kit from there. The install stays two commands.
 
 ## When an editor is stuck
 
 Almost every failure is one of five things, in this order of likelihood:
 
+0. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
+   instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
+   they have not restarted Claude Code since installing. Plugins load once at startup, and
+   resuming the same conversation does not reload them; it must be a new session.
 1. **CapCut was open during a write.** The single most common cause of a broken draft.
    Have them close it and run `python _state/post_session_fix.py "<draft folder>"`.
 2. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
