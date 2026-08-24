@@ -9,9 +9,20 @@ failure → report and STOP.
 **Stage 1 — Analyze.** ffprobe the input. faster-whisper — **use the model named in
 `_state/warm_models.py` (`small.en`); do not pick a different one.** Four editors on four
 models produce four different transcripts, and every sticker's exact words and every asset's
-timing are anchored to that transcript. It is pre-downloaded during setup, so transcription
-should never pause to fetch weights — if it does, either the model name is wrong or the
-cache is missing, and `python _state/warm_models.py` fixes it. With `word_timestamps=True` →
+timing are anchored to that transcript. **Never substitute a smaller or faster model
+because a download is slow** — that silently changes the transcript the whole build rests on.
+
+**Check the model is cached BEFORE transcribing** (`python _state/warm_models.py --check`).
+If it is not, do **not** try to download it from inside a tool call: the weights are ~500MB
+and the download will exceed the tool timeout, which reads as a connection failure and
+wastes ten minutes. Stop and tell the editor to run this at their **PowerShell** prompt,
+with Claude closed, then say "run it" again:
+
+```
+python -c "from faster_whisper import WhisperModel; WhisperModel('small.en', device='cpu', compute_type='int8')"
+```
+
+With the model cached, `word_timestamps=True` →
 words.json + transcript. Scene-detect the cuts. **Extract a frame contact sheet of
 the input** (tile ~16 frames) and LOOK at it: framing, where her face/hands sit,
 mic position — this calibrates safe zones. Then do a **written transcript analysis**

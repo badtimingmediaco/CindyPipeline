@@ -147,21 +147,30 @@ Almost every failure is one of these, in rough order of likelihood:
    Then consider corporate/school firewalls and antivirus doing HTTPS inspection. To
    confirm, at the POWERSHELL prompt with Claude closed:
    `curl.exe -s -o NUL -w "%{http_code}" https://api.anthropic.com/v1/models`
-7. **CapCut was open during a write.** The single most common cause of a broken draft.
+7. **Stage 1 stalls, then reports a connection error, but the network is fine.** The
+   Whisper weights (~500MB) are downloading inside a tool call and exceeding its timeout.
+   Confirm with `curl` that huggingface.co answers - it usually does, which is what makes
+   this read as a mystery. Fix: have them close Claude and run the download from the
+   POWERSHELL prompt, where nothing times out:
+   `python -c "from faster_whisper import WhisperModel; WhisperModel('small.en', device='cpu', compute_type='int8')"`
+   Then re-run the build. Setups from v4.6.0 onward pre-download this, so it should only
+   affect editors who set up before then. **Do not let the agent substitute a smaller
+   model to get past it** - that changes the transcript the entire build is anchored to.
+8. **CapCut was open during a write.** The single most common cause of a broken draft.
    Have them close it and run `python _state/post_session_fix.py "<draft folder>"`.
-8. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
+9. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
    clones plugins over SSH even for a public repo, and a machine with no GitHub key fails
    with "Host key verification failed".
-9. **A font is missing or misnamed.** Both fonts ship and install automatically, so this
+10. **A font is missing or misnamed.** Both fonts ship and install automatically, so this
    should be rare - re-running the installer line fixes it. Awelier must end up registered
    as `MADE Awelier PERSONAL USE ...`; if it registered under its FILENAME instead
    (`MADEAwelierPERSONALUSE-Bold`), CapCut will not find the family and the title renders
    wrong. `kit/fonts/fontnames.json` is what prevents that.
-10. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
-11. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
+11. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
+12. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
    link in the chain broke.
 
-`python _state/doctor.py` catches 1, 7, 9 and 10 outright. It checks the kit, not connectivity, so it catches none of the network failures. Ask for its full output before
+`python _state/doctor.py` catches 1, 8, 10 and 11 outright. It checks the kit, not connectivity, so it catches none of the network failures. Ask for its full output before
 theorising.
 
 ## The thing worth protecting

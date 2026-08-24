@@ -64,6 +64,10 @@ def main():
         return 2
 
     print(f"  downloading {a.model} ... (a few hundred MB, one time)")
+    print("  This can take several minutes with no visible output. That is normal.")
+    print("  RUN THIS FROM A TERMINAL, not from inside an agent tool call - the download")
+    print("  outlives most tool timeouts, and a timeout there looks like a network failure.")
+    print("  Interrupted downloads resume, so re-running after a drop is safe.")
     t = time.time()
     try:
         WhisperModel(a.model, device="cpu", compute_type="int8")
