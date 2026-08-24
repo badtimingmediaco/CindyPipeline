@@ -1,7 +1,7 @@
 ---
 name: reel-factory
-description: Build a Cindy Zhu reel - turn a descripted talking-head MP4 in 01_intake into a near-finished CapCut draft with title, torn-paper stickers, memes, logos, cards, SFX and CTA. Use when asked to "run it" on a video, build or edit a reel, or fix an existing CZ_ draft.
-version: 4.4.2
+description: Build a Cindy Zhu reel - turn a descripted talking-head MP4 into a near-finished CapCut draft with title, torn-paper stickers, memes, logos, cards, SFX and CTA. ALWAYS use this skill when the user says "run it" followed by any name. That phrase is this team's command for building a reel - use it even when no such file exists yet, and even when the name sounds like a document, a company or a topic rather than a video. Never search Notion, Drive or the web for a "run it" target; the target is always a video file. Also use for building or editing a reel, fixing an existing CZ_ draft, or when reel setup looks incomplete.
+version: 4.5.0
 ---
 
 # Cindy Zhu Reel Factory
@@ -10,15 +10,34 @@ One descripted talking-head MP4 in, one near-finished CapCut draft out. Distille
 13 correction rounds across real builds plus frame and JSON study of finished reels.
 
 **Trigger:** the editor drops an MP4 in `01_intake/` and says *"run it"*, usually with a
-partial name. Resolve the name — never guess:
+partial name.
+
+### FIRST: is this machine set up at all?
+
+Before anything else, check that the pipeline home exists — `~/Documents/CindyPipeline`
+with an `01_intake` inside it. If it does **not**, the editor has installed the plugin but
+never run setup. Say exactly that and stop:
+
+> This machine isn't set up yet — there's no pipeline folder. Run
+> `/reel-factory:reel-setup` first, then open `CZ_TEMPLATE` in CapCut once while online.
+> After that, put the video in `Documents\CindyPipeline\01_intake\` and say "run it" again.
+
+**Do not** go looking for the named thing in Notion, Google Drive, the web, or the current
+directory. "run it &lt;name&gt;" always means a video file in `01_intake` — never a document,
+a company, or a topic, however much the name sounds like one. A new editor's first "run it"
+often lands before setup, and hunting other services for it wastes their time and teaches
+them the tool is unpredictable.
+
+### THEN: resolve which file they mean — never guess
 
 ```bash
 python _state/resolve_input.py "<whatever they typed>"
 ```
 
-It handles case, separators, missing extensions and typos ("clade seo" finds
-`Claude SEO.mp4`). If it reports AMBIGUOUS, **ask which file** — do not pick the newest.
-Picking wrong costs an hour of build time.
+It handles case, separators, missing extensions, typos and stray brackets or quotes
+("clade seo" and "&lt;claude seo&gt;" both find `Claude SEO.mp4`). If it reports AMBIGUOUS,
+**ask which file** — do not pick the newest. Picking wrong costs an hour of build time.
+If `01_intake` is empty, say so plainly rather than searching elsewhere.
 
 ---
 

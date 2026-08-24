@@ -121,12 +121,13 @@ Almost every failure is one of these, in rough order of likelihood:
    - it replaced the chat window. They still edit in CapCut; Claude just builds the draft
    first. Expect this question from everyone; the README's "How this works day to day"
    table answers it.
-4. **"I don't have a skill matching ..." after they say `run it something`.** The plugin
-   is not loaded in that session. Claude went looking for a skill NAMED whatever they
-   typed, which means no reel-factory skill was present to match on "run it". Have them
-   run `claude plugin list`: if reel-factory is absent the installer did not finish; if it
-   is listed they must fully QUIT Claude Code and reopen, since plugins load only at
-   startup. Confirm by typing `/reel` and seeing the three commands appear.
+4. **`run it <name>` goes hunting in Notion, Drive or the web instead of building.**
+   Almost always: the plugin IS installed and loaded, but they never ran
+   `/reel-factory:reel-setup`, so no pipeline folder exists and nothing looks like a video
+   to match. Have them run setup, then the CapCut template step, then try again. Check
+   `claude plugin list` only to rule the plugin out - if reel-factory is missing the
+   installer did not finish; if it is listed but its commands do not appear, they must
+   fully QUIT Claude Code and reopen, since plugins load only at startup.
 5. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
    instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
    they have not restarted Claude Code since installing. Plugins load once at startup, and
