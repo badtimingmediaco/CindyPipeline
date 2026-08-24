@@ -43,7 +43,15 @@ KIT_MAP = [
 ]
 SCRIPTS = ["house_layout.py", "verify_build.py", "tenor_fetch.py", "post_session_fix.py",
            "enforce_track_order.py", "preview_composite.py", "doctor.py", "resolve_input.py",
-           "warm_models.py"]
+           "warm_models.py", "build.py", "visual_gate.py", "meme_qa.py", "meme_sheet.py",
+           "meme_catalog.json", "THE_METHOD.md"]
+
+# The build engine, shipped as a package. Code is ALWAYS refreshed on setup, unlike kit
+# content which is preserved: the audit that produced version blueberry found this
+# checkout shipping a verify_build.py old enough to FAIL a correct build, because code was
+# being treated as user data and skipped when it already existed. Drift between copies is
+# the failure mode, not lost customisation - there is nothing here to customise.
+ENGINE_PKG = "engine"
 
 log = []
 
@@ -179,9 +187,20 @@ def main():
     for f in SCRIPTS:
         s = os.path.join(HERE, f)
         d = os.path.join(pipe, "_state", f)
-        if os.path.exists(s) and (args.force or not os.path.exists(d)):
-            shutil.copy2(s, d)
-    say(f"   _state/ scripts             {len(SCRIPTS)} installed")
+        if os.path.exists(s):
+            shutil.copy2(s, d)          # always refresh: this is code, not content
+    say(f"   _state/ scripts             {len(SCRIPTS)} refreshed")
+
+    src_eng = os.path.join(HERE, ENGINE_PKG)
+    dst_eng = os.path.join(pipe, "_state", ENGINE_PKG)
+    n_eng = 0
+    if os.path.isdir(src_eng):
+        os.makedirs(dst_eng, exist_ok=True)
+        for f in os.listdir(src_eng):
+            if f.endswith(".py"):
+                shutil.copy2(os.path.join(src_eng, f), os.path.join(dst_eng, f))
+                n_eng += 1
+    say(f"   _state/engine/              {n_eng} module(s) refreshed")
 
     # 3 - the template draft ------------------------------------------------
     say("\n3. CapCut template")

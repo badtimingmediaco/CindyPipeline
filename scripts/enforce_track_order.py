@@ -95,14 +95,31 @@ def enforce(draft_dir, dry_run=False):
         report["dry_run"] = True
         return report
 
-    # backup then write canonical, then mirror it with a plain copy
+    # backup then write canonical, then mirror it to EVERY copy CapCut keeps
     bak = os.path.join(draft_dir, "_order_bak_" +
                        datetime.datetime.now().strftime("%H%M%S") + ".json")
     shutil.copy2(canon, bak)
     json.dump(d, open(canon, "w", encoding="utf-8"), ensure_ascii=False)
+
+    # This is the LAST write of a build, so it is the write that decides what CapCut
+    # opens. Version berry mirrored only draft_content.json and left Timelines/<uuid>/
+    # holding the pre-order state; re-syncing it was a step in THE_METHOD that a human had
+    # to remember. A step you have to remember is a defect waiting for a busy day.
+    mirrors = []
     if mirror:
-        shutil.copy2(canon, mirror)
-        report["mirrored"] = True
+        mirrors.append(mirror)
+    tl = os.path.join(draft_dir, "Timelines")
+    if os.path.isdir(tl):
+        for sub in os.listdir(tl):
+            sd = os.path.join(tl, sub)
+            if os.path.isdir(sd):
+                for name in ("template-2.tmp", "draft_content.json"):
+                    p = os.path.join(sd, name)
+                    if os.path.exists(p):
+                        mirrors.append(p)
+    for m in mirrors:
+        shutil.copy2(canon, m)
+    report["mirrored"] = [os.path.relpath(m, draft_dir) for m in mirrors]
     return report
 
 

@@ -80,8 +80,31 @@ Full detail in `reference/05-pipeline.md`. The shape:
 | **1 Analyze** | ffprobe, faster-whisper with word timestamps, scene-detect the cuts, and **look at a frame contact sheet** to calibrate the safe zones on this framing. Then write the transcript analysis. |
 | **2 Ask** | One batched round of questions, only for what the guardrails do not already decide. |
 | **3 Plan** | `03_plans/<name>_plan.md` — title, every sticker, every meme brief, logo moments, SFX schedule, cut-trim table. Everything width-checked and density-checked on paper before touching CapCut. |
-| **4 Execute** | Strictly per plan. Clone template → V1 → title → stickers → memes → logos → cards → SFX → volume → CTA → track order → mirror sync. |
-| **5 Verify** | Run the checks, fix every finding, re-run. **Loop until zero failures.** Then write `05_output/<name>/NOTES.md`. |
+| **4 Execute** | Write `_runs/<name>/spec.json`, then `python _state/build.py <spec>`. Clone `CZ_TEMPLATE` fresh first — never build on top of a previous build. |
+| **5 Verify** | `enforce_track_order.py` → `verify_build.py` → `visual_gate.py`, **and look at the sheet**. Loop until zero failures. Then write `05_output/<name>/NOTES.md`. |
+
+### Stage 4 in detail — the spec is the only thing you write
+
+There is ONE engine (`_state/engine/`). You never fork it, and you never write a builder
+script. A video is a spec file:
+
+```bash
+python _state/build.py _runs/<name>/spec.json --check
+```
+
+```bash
+python _state/build.py _runs/<name>/spec.json
+```
+
+**A spec may not contain geometry.** No `x`, `y`, `scale`, `target_w`, or anchor — the
+validator hard-fails on them and names the band to use instead. You write clause timings,
+which asset, and the copy; the engine solves every coordinate from the artefacts on every
+build. See `_state/THE_METHOD.md` §1 for why that is enforced rather than encouraged, and
+the plugin's `examples/example_spec.json` for a complete worked spec.
+
+The validator also refuses: an asset that is not on disk, a meme that is not in
+`meme_catalog.json` with `use: "ok"`, an invented SFX filename, an annotation naming a
+coordinate instead of a card region, and beats that are out of time order.
 
 ---
 
@@ -118,8 +141,12 @@ All in `_state/` after setup. Import them; do not re-derive what they encode.
 
 | Script | Does |
 |---|---|
-| `house_layout.py` | **The placement laws**, measured off her own hand-finished edits. `meme_geom()`, `card_geom()`, `place_sticker()`, the annotation sticker kit. Never hand-type a scale or transform — call these. |
-| `verify_build.py` | The scripted assertions. The build's gate. |
+| `build.py` | **The entry point.** `python _state/build.py <spec.json>`. Validates, then foundation, then overlays. |
+| `engine/` | The one engine: `spec` (validation), `measure` (solves every number), `layout` (band names → measured laws), `materials`, `draftio` (the four-copy save), `foundation`, `overlays`. Never fork it. |
+| `house_layout.py` | **The placement laws**, measured off her own hand-finished edits. The ONLY place a geometric number may be typed, and every one carries its provenance. |
+| `verify_build.py` | The scripted assertions. The build's gate. Section 8c asserts no ghost layers, full style-range coverage, and that all four timeline copies are identical. |
+| `visual_gate.py` | Renders V1 + media + real text + real stickers at 1080x1920 and fails on off-frame or overlapping text. **A clean exit is not permission to skip looking at the sheet.** |
+| `meme_catalog.json` | The curated allow-list, enforced by `engine/spec.py` — only `use: "ok"` may be placed. |
 | `tenor_fetch.py` | Meme sourcing from Tenor, no API key, MP4 only — never the .gif. Run `--selftest` first, or whenever a slot comes back empty: it separates "Tenor changed its markup" from "that query has nothing" from "no internet", which look identical from inside a build. |
 | `resolve_input.py` | Fuzzy intake filename matching. |
 | `doctor.py` | Stage 0. |
