@@ -1,7 +1,7 @@
 ---
 name: reel-factory
 description: Build a Cindy Zhu reel - turn a descripted talking-head MP4 into a near-finished CapCut draft with title, torn-paper stickers, memes, logos, cards, SFX and CTA. ALWAYS use this skill when the user says "run it" followed by any name. That phrase is this team's command for building a reel - use it even when no such file exists yet, and even when the name sounds like a document, a company or a topic rather than a video. Never search Notion, Drive or the web for a "run it" target; the target is always a video file. Also use for building or editing a reel, fixing an existing CZ_ draft, or when reel setup looks incomplete.
-version: 4.6.1
+version: 4.7.0
 ---
 
 # Cindy Zhu Reel Factory
@@ -100,6 +100,17 @@ Load only what the current stage needs.
 | `reference/06-capcut.md` | Touching CapCut JSON, or after a render-killer, or verifying |
 | `reference/07-rules.md` | The hard NEVER list and the learning loop |
 | `reference/08-cards.md` | Drawing any card, graphic or fabricated asset |
+
+**Two more live in `_state/`, not in `reference/`, and both are REQUIRED reading before you
+plan a video.** They are the difference between output that looks like hers and output that
+merely follows the rules:
+
+| File | What it is |
+|---|---|
+| `_state/master_reference.md` | The brand bible — her voice, her visual language, why the format works. Outranks the reference files on brand questions, except where §2–5 carry newer measured values. |
+| `_state/learnings/*.md` | Every correction she has made by hand, round by round. The single richest source of what "good" means here. Read **all** files in that folder — a fresh machine has one archive file; a machine that has delivered videos has more. |
+
+Skipping these is how a build ends up technically valid and stylistically wrong.
 
 ## THE SCRIPTS
 

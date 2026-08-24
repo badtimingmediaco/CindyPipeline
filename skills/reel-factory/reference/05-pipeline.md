@@ -35,7 +35,12 @@ list (Claude, CapCut, Descript, this video's tools; whisper mishears
 **Stage 2 — Ask.** If anything is ambiguous (which tools get logos, CTA word, whether
 screen recordings are wanted, unclear beats), ask the user NOW — one batched round of
 questions. Don't ask about things the guardrails already decide.
-**Stage 3 — Plan of action** → `03_plans/<name>_plan.md` (agent's own reference +
+**Stage 3 — Plan of action.** **BEFORE writing a single line of the plan, read
+`_state/master_reference.md` and every file in `_state/learnings/`.** The brand bible tells
+you what her work is trying to be; the learnings tell you every correction she has already
+made by hand. Neither is optional, and a plan written without them will be technically
+valid and stylistically wrong — which is the most expensive kind of failure here, because
+it passes verification. Then write → `03_plans/<name>_plan.md` (agent's own reference +
 audit trail):
 - **Title drafting happens HERE, from the transcript analysis.** Draft 3–5 candidates
   in her molds ("how to X" > "turn Claude into Y" > "N secret Z" > "stop X from Y").

@@ -55,7 +55,21 @@ version forever. The installer therefore runs `marketplace update` and `plugin u
 too. `plugin update` needs the fully qualified `reel-factory@cindy-reel-factory` - the
 bare plugin name reports "not found".
 
-Updates need a Claude Code restart to take effect. Tell editors that when you ship one.
+Updates need a Claude Code restart to take effect.
+
+**Editors are told automatically.** The plugin ships a SessionStart hook
+(`hooks/check_update.py`) that checks the published version at most once a day and prints
+a one-line notice with the update command when they are behind. So you do not have to
+chase anyone - but they still have to run the command, and restart.
+
+Why it notifies instead of self-updating: running `claude plugin update` from inside a
+live session rewrites the plugin cache that same session is reading from, and the new
+version would not apply until a restart regardless. The editor would be told nothing while
+their files changed underneath them. A notice they can act on is safer and clearer.
+
+The hook fails silently on every path - offline, blocked, malformed response - and stamps
+its throttle file BEFORE the network call, so a hanging request cannot make every session
+retry.
 
 **Wait ~5 minutes after pushing before telling anyone to re-run.** The installer is fetched
 from `raw.githubusercontent.com`, which serves a cached copy for a few minutes after a push

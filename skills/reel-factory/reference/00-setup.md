@@ -37,7 +37,8 @@ The automation needs these present; run Stage 0 (§6) to verify, and STOP if mis
    `04_assets/logos`, `04_assets/screenrecs`, `05_output`, `_state`, `_backups`.
 6. **State files** in `_state/`: `master_reference.md` (brand bible — outranks this
    file on brand questions except where §2–5 carry newer verified values),
-   `style_learnings.md` (read every session, append after every delivered video),
+   `learnings/` (dated entries; READ EVERY FILE before planning, append after every
+   delivered video),
    `paper_donor_child.json` + `tpl_paper.json` (styled paper-text donors — regenerate
    from the template's sample layer via `capcut save-template` BEFORE ever deleting it),
    and a per-video `<name>_paper_text_map.json` (segment-id → sticker text).

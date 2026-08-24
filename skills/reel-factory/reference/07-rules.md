@@ -15,5 +15,5 @@ writing while CapCut is open.
 
 ## 9. LEARNING LOOP
 After every delivered video ask the owner what they changed by hand → append to
-`_state/style_learnings.md` → apply next run. If learnings contradict this file 3+
+`_state/learnings/<date>-<topic>.md` → apply next run. If learnings contradict this file 3+
 times, propose a spec patch.
