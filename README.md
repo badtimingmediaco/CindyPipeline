@@ -61,6 +61,19 @@ those files live inside CapCut, not on disk.
 
 That's it. You're ready to build.
 
+### Two different prompts — this trips everyone up
+
+There are two places you can type, and they are not interchangeable.
+
+| Prompt | Looks like | What goes here |
+|---|---|---|
+| **PowerShell** | `PS C:\Users\you>` | `claude`, and anything starting with `claude plugin ...` |
+| **Claude** | a bare `>` after you have run `claude` | `run it mobile app`, `/reel-factory:reel-setup`, and anything you want Claude to do |
+
+If you type a `claude plugin ...` command at the **Claude** prompt, Claude will ask
+permission to run it as a shell command. Saying yes works fine — but it is cleaner to
+`/exit` back to PowerShell first.
+
 ## How this works day to day
 
 **You do not edit in PowerShell.** PowerShell is only where you *talk to Claude* — it
