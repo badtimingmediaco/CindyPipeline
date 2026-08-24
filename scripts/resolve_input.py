@@ -25,9 +25,23 @@ STRONG = 0.72
 TOO_CLOSE = 0.08
 
 
+def strip_wrappers(q):
+    """Drop placeholder punctuation an editor copied from the instructions.
+
+    Docs that read `run it <name>` get typed back literally as
+    `run it <emergent analyse stocks>`, brackets and all. Same for quotes. Strip them
+    rather than failing to match - the editor did nothing wrong, the instructions did.
+    """
+    q = (q or "").strip()
+    for a, b in (("<", ">"), ("[", "]"), ("{", "}"), ('"', '"'), ("'", "'"), ("`", "`")):
+        while len(q) > 1 and q.startswith(a) and q.endswith(b):
+            q = q[1:-1].strip()
+    return q
+
+
 def norm(s):
     """Fold everything an editor might vary: case, separators, extension, articles."""
-    s = os.path.splitext(s)[0].lower()
+    s = os.path.splitext(strip_wrappers(s))[0].lower()
     s = re.sub(r"[_\-.]+", " ", s)
     s = re.sub(r"[^a-z0-9 ]+", "", s)
     s = re.sub(r"\b(the|a|an|final|v\d+|d\d+|copy)\b", " ", s)

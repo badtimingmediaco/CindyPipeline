@@ -121,25 +121,31 @@ Almost every failure is one of these, in rough order of likelihood:
    - it replaced the chat window. They still edit in CapCut; Claude just builds the draft
    first. Expect this question from everyone; the README's "How this works day to day"
    table answers it.
-4. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
+4. **"I don't have a skill matching ..." after they say `run it something`.** The plugin
+   is not loaded in that session. Claude went looking for a skill NAMED whatever they
+   typed, which means no reel-factory skill was present to match on "run it". Have them
+   run `claude plugin list`: if reel-factory is absent the installer did not finish; if it
+   is listed they must fully QUIT Claude Code and reopen, since plugins load only at
+   startup. Confirm by typing `/reel` and seeing the three commands appear.
+5. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
    instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
    they have not restarted Claude Code since installing. Plugins load once at startup, and
    resuming the same conversation does not reload them; it must be a new session.
-5. **CapCut was open during a write.** The single most common cause of a broken draft.
+6. **CapCut was open during a write.** The single most common cause of a broken draft.
    Have them close it and run `python _state/post_session_fix.py "<draft folder>"`.
-6. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
+7. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
    clones plugins over SSH even for a public repo, and a machine with no GitHub key fails
    with "Host key verification failed".
-7. **A font is missing or misnamed.** Both fonts ship and install automatically, so this
+8. **A font is missing or misnamed.** Both fonts ship and install automatically, so this
    should be rare - re-running the installer line fixes it. Awelier must end up registered
    as `MADE Awelier PERSONAL USE ...`; if it registered under its FILENAME instead
    (`MADEAwelierPERSONALUSE-Bold`), CapCut will not find the family and the title renders
    wrong. `kit/fonts/fontnames.json` is what prevents that.
-8. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
-9. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
+9. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
+10. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
    link in the chain broke.
 
-`python _state/doctor.py` catches 1, 5, 7 and 8 outright. Ask for its full output before
+`python _state/doctor.py` catches 1, 6, 8 and 9 outright. Ask for its full output before
 theorising.
 
 ## The thing worth protecting

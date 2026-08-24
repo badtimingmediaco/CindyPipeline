@@ -70,7 +70,7 @@ and that is still where you will spend most of your time.
 | Where | What you do |
 |---|---|
 | **File Explorer** | Drop your MP4 into `Documents\CindyPipeline\01_intake\` |
-| **PowerShell** — run `claude` | Say `run it <name>`. It analyses, plans and builds the draft. **CapCut must be closed while it works.** |
+| **PowerShell** — run `claude` | Say `run it` and the video's name, e.g. `run it mobile app`. It analyses, plans and builds the draft. **CapCut must be closed while it works.** |
 | **CapCut** | Open the new `CZ_...` draft. Polish, run auto-captions, colour grade, export. |
 | **PowerShell** | `/reel-factory:reel-learn` — tell it what you changed by hand |
 
@@ -89,9 +89,9 @@ Drop an MP4 into `01_intake/` and say:
 run it claude seo
 ```
 
-The name does not have to be right. Case, dashes, missing extensions and typos are all
-fine — `run it clade seo` finds `Claude SEO.mp4`. If two files are genuinely close, it
-asks rather than guessing.
+Type the name plainly — **no angle brackets, no quotes**. The name does not have to be
+right either: case, dashes, missing extensions and typos are all fine, so `run it clade seo`
+finds `Claude SEO.mp4`. If two files are genuinely close, it asks rather than guessing.
 
 Then it analyses the video, plans the edit, builds the draft, and verifies its own work in
 a loop until the checks pass. You open the result in CapCut and polish.
