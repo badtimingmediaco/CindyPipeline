@@ -211,27 +211,41 @@ if ($fontSrc -and (Test-Path $fontSrc)) {
     $dst = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
     New-Item -ItemType Directory -Force $dst | Out-Null
     $key = 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+
+    # Register each face under its REAL display name, not its filename.
+    #
+    # Windows shows the registry value name in font pickers, and CapCut matches on the
+    # family. Awelier's files are named MADEAwelierPERSONALUSE-Bold.otf but a correct
+    # install registers "MADE Awelier PERSONAL USE Bold" - deriving the name from the
+    # filename would produce a family CapCut does not recognise. fontnames.json holds the
+    # exact mapping, read off a known-good manual install.
+    $names = @{}
+    $mapFile = Join-Path $fontSrc 'fontnames.json'
+    if (Test-Path $mapFile) {
+        try {
+            (Get-Content $mapFile -Raw | ConvertFrom-Json).PSObject.Properties |
+                ForEach-Object { $names[$_.Name] = $_.Value }
+        } catch { }
+    }
+
     $n = 0
     foreach ($f in Get-ChildItem $fontSrc -Include *.ttf, *.otf -Recurse) {
         $target = Join-Path $dst $f.Name
-        if (-not (Test-Path $target)) { Copy-Item $f.FullName $target }
-        $name = "$($f.BaseName) (TrueType)"
-        if (-not (Get-ItemProperty -Path $key -Name $name -ErrorAction SilentlyContinue)) {
-            New-ItemProperty -Path $key -Name $name -Value $target -PropertyType String -Force | Out-Null
-        }
+        if (-not (Test-Path $target)) { Copy-Item $f.FullName $target -ErrorAction SilentlyContinue }
+        $name = $names[$f.Name]
+        if (-not $name) { $name = "$($f.BaseName) (TrueType)" }
+        New-ItemProperty -Path $key -Name $name -Value $target -PropertyType String -Force | Out-Null
         $n++
     }
-    if ($n) { Ok "$n font file(s) registered (Poppins)" }
-} else { Note "Poppins not found in the kit - install it from Google Fonts if setup flags it" }
+    if ($n) { Ok "$n font file(s) installed and registered (Poppins + MADE Awelier)" }
+    else { Bad "no font files found in the kit" }
+} else { Bad "kit/fonts not found - fonts were not installed" }
 
-$awelier = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Fonts", "$env:WINDIR\Fonts" `
-             -Filter '*welier*' -ErrorAction SilentlyContinue | Select-Object -First 1
-if ($awelier) { Ok "MADE Awelier already installed" }
-else {
-    Note "MADE Awelier is NOT installed, and cannot be shipped here (personal-use licence)."
-    Note "Download it, right-click the .ttf files and choose Install. Its family name must"
-    Note "read 'MADE Awelier PERSONAL USE' - that is the exact name CapCut needs."
-}
+# Confirm by the name CapCut actually needs, not by "a file exists somewhere".
+$reg = Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' -ErrorAction SilentlyContinue
+$hasAwelier = $reg.PSObject.Properties | Where-Object { $_.Name -like '*Awelier*' } | Select-Object -First 1
+if ($hasAwelier) { Ok "MADE Awelier registered as '$($hasAwelier.Name)'" }
+else { Bad "MADE Awelier did not register - CapCut will not render the title correctly" }
 
 # ---------------------------------------------------------------- done
 Say ""

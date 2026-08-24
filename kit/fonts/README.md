@@ -1,16 +1,21 @@
 # Fonts
 
-**Poppins** ships here and the installer registers it per-user automatically. It is
-licensed under the SIL Open Font License, which permits redistribution.
+Both fonts ship here and `install.ps1` registers them per-user automatically. No manual
+font installation is needed on a new machine.
 
-**MADE Awelier does NOT ship here** and must not be added. It is licensed for personal
-use only, and this is a public repository — bundling it would be redistributing a
-personal-use font to anyone who finds the repo. Each editor downloads and installs it
-themselves.
+- **Poppins** — 18 TTF faces, SIL Open Font License.
+- **MADE Awelier** — 6 OTF faces. Shipped at the repo owner's explicit direction.
 
-Its installed family name must read **`MADE Awelier PERSONAL USE`** — that exact string is
-what CapCut matches on, and what `doctor.py` checks for. The files are named like
-`MADEAwelierPERSONALUSE-Bold.otf`.
+`fontnames.json` maps each file to the exact name it must be registered under, read off a
+known-good manual install. **This matters:** Awelier's files are named
+`MADEAwelierPERSONALUSE-Bold.otf`, but a correct install registers the face as
+`MADE Awelier PERSONAL USE Bold`. Deriving the name from the filename produces a family
+CapCut does not recognise, and the title silently renders in the wrong font. If you add or
+replace a face, add its real display name to that map.
 
-**Markerist is neither** — it lives only inside CapCut's own effect cache and arrives when
-you open `CZ_TEMPLATE` in CapCut while online. There is no filesystem font to install.
+Installation is per-user: the file is copied to `%LOCALAPPDATA%\Microsoft\Windows\Fonts`
+and registered under `HKCU`. No admin rights, and it is exactly where `doctor.py` looks.
+
+**Markerist is not here and cannot be.** It lives only inside CapCut's own effect cache and
+arrives when you open `CZ_TEMPLATE` in CapCut while online. There is no filesystem font to
+install.

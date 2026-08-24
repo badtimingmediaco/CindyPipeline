@@ -77,9 +77,6 @@ touching their own work. Say so explicitly when you ship new assets.
 
 ## What is deliberately NOT in here
 
-- **MADE Awelier.** Licensed personal-use. Redistributing it to four people in a public
-  repo is not ours to do. Each editor installs it themselves; the doctor checks for it by
-  its real installed name, `MADE Awelier PERSONAL USE`.
 - **CapCut's effect cache** — the Markerist font, the torn-paper effect, the caption
   assets. Machine-local, downloaded by CapCut itself. No kit can ship these; opening
   `CZ_TEMPLATE` once while online is the only way, and it is the one manual step.
@@ -123,9 +120,11 @@ Almost every failure is one of these, in rough order of likelihood:
 6. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
    clones plugins over SSH even for a public repo, and a machine with no GitHub key fails
    with "Host key verification failed".
-7. **A font is missing or misnamed.** Awelier must be installed as
-   `MADE Awelier PERSONAL USE`. Per-user installs are fine and are what the doctor looks
-   for.
+7. **A font is missing or misnamed.** Both fonts ship and install automatically, so this
+   should be rare - re-running the installer line fixes it. Awelier must end up registered
+   as `MADE Awelier PERSONAL USE ...`; if it registered under its FILENAME instead
+   (`MADEAwelierPERSONALUSE-Bold`), CapCut will not find the family and the title renders
+   wrong. `kit/fonts/fontnames.json` is what prevents that.
 8. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
 9. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
    link in the chain broke.

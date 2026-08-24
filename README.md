@@ -29,9 +29,9 @@ irm https://raw.githubusercontent.com/badtimingmediaco/CindyPipeline/main/instal
 
 Press enter and leave it. It takes a few minutes and asks you nothing.
 
-It installs git, Node, Python, ffmpeg, `capcut-cli`, the Claude Code CLI, the Poppins font
-and the plugin itself — skipping anything you already have. Then it tells you the two
-things left to do.
+It installs git, Node, Python, ffmpeg, `capcut-cli`, the Claude Code CLI, **both fonts** and
+the plugin itself — skipping anything you already have. Then it tells you the one thing
+left to do.
 
 <details>
 <summary>To open PowerShell: press <b>Win</b>, type <code>powershell</code>, hit enter.</summary>
@@ -44,7 +44,7 @@ installed program yet, and a second run clears them.
 
 </details>
 
-### Then, two things
+### Then
 
 **1.** Open a new terminal, run `claude`, and type:
 
@@ -118,8 +118,8 @@ know what is on your machine, and what to do if a piece ever breaks.
 | **Node.js** + `capcut-cli` | `npm i -g capcut-cli` |
 | **Python 3** + `faster-whisper`, `pillow` | `pip install faster-whisper pillow` |
 | **ffmpeg** | `winget install Gyan.FFmpeg` |
-| **Poppins** | Ships with the kit (OFL-licensed) and is registered for you automatically. |
-| **MADE Awelier** | **The one thing you install by hand.** Licensed personal-use, so it cannot ship in a public repo. Download it, select the `.otf` files, right-click → Install. The family name must read `MADE Awelier PERSONAL USE`. |
+| **Poppins** | Ships with the kit and is registered for you automatically. |
+| **MADE Awelier** | Ships with the kit and is registered for you automatically, under the exact family name CapCut needs (`MADE Awelier PERSONAL USE`). |
 
 **Windows only for now.** The scripts have POSIX branches so they do not crash on a Mac,
 but macOS is not supported yet.
