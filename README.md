@@ -106,6 +106,17 @@ Type the name plainly — **no angle brackets, no quotes**. The name does not ha
 right either: case, dashes, missing extensions and typos are all fine, so `run it clade seo`
 finds `Claude SEO.mp4`. If two files are genuinely close, it asks rather than guessing.
 
+**If "run it" ever gets misunderstood** — Claude starts searching Notion, Drive or the web
+instead of building — use the explicit command instead:
+
+```
+/reel-factory:reel-run claude seo
+```
+
+That does exactly the same thing but leaves nothing to interpretation. It is worth
+reaching for whenever your video's name sounds like a document, a company or a topic
+rather than a video, since those readings compete with the plain one.
+
 Then it analyses the video, plans the edit, builds the draft, and verifies its own work in
 a loop until the checks pass. You open the result in CapCut and polish.
 

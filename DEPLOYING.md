@@ -128,6 +128,13 @@ Almost every failure is one of these, in rough order of likelihood:
    `claude plugin list` only to rule the plugin out - if reel-factory is missing the
    installer did not finish; if it is listed but its commands do not appear, they must
    fully QUIT Claude Code and reopen, since plugins load only at startup.
+
+   If setup HAS been run and the video IS in 01_intake, the skill simply failed to
+   trigger - a competing reading won. This is likeliest when the editor has Notion or
+   Drive connected AND the video name reads like a document or a company ("emergent
+   analyse stocks" lost to a stocks-research interpretation on a real machine). Tell them
+   to use the explicit `/reel-factory:reel-run <name>` command, which leaves nothing to
+   interpretation, and to update for the sharpened skill description (v4.5.0+).
 5. **`Unknown command`.** Two causes, both cosmetic. Either they typed `/reel-setup`
    instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
    they have not restarted Claude Code since installing. Plugins load once at startup, and

@@ -1,7 +1,7 @@
 ---
 name: reel-factory
 description: Build a Cindy Zhu reel - turn a descripted talking-head MP4 into a near-finished CapCut draft with title, torn-paper stickers, memes, logos, cards, SFX and CTA. ALWAYS use this skill when the user says "run it" followed by any name. That phrase is this team's command for building a reel - use it even when no such file exists yet, and even when the name sounds like a document, a company or a topic rather than a video. Never search Notion, Drive or the web for a "run it" target; the target is always a video file. Also use for building or editing a reel, fixing an existing CZ_ draft, or when reel setup looks incomplete.
-version: 4.5.0
+version: 4.5.1
 ---
 
 # Cindy Zhu Reel Factory
