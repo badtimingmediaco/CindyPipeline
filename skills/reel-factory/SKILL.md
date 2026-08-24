@@ -23,7 +23,7 @@ never run setup. Say exactly that and stop:
 > After that, put the video in `Documents\CindyPipeline\01_intake\` and say "run it" again.
 
 **Do not** go looking for the named thing in Notion, Google Drive, the web, or the current
-directory. "run it &lt;name&gt;" always means a video file in `01_intake` — never a document,
+directory. "run it <name>" always means a video file in `01_intake` — never a document,
 a company, or a topic, however much the name sounds like one. A new editor's first "run it"
 often lands before setup, and hunting other services for it wastes their time and teaches
 them the tool is unpredictable.
@@ -35,7 +35,7 @@ python _state/resolve_input.py "<whatever they typed>"
 ```
 
 It handles case, separators, missing extensions, typos and stray brackets or quotes
-("clade seo" and "&lt;claude seo&gt;" both find `Claude SEO.mp4`). If it reports AMBIGUOUS,
+("clade seo" and "<claude seo>" both find `Claude SEO.mp4`). If it reports AMBIGUOUS,
 **ask which file** — do not pick the newest. Picking wrong costs an hour of build time.
 If `01_intake` is empty, say so plainly rather than searching elsewhere.
 
