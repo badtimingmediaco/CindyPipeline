@@ -139,21 +139,29 @@ Almost every failure is one of these, in rough order of likelihood:
    instead of `/reel-factory:reel-setup` — every command is namespaced by the plugin — or
    they have not restarted Claude Code since installing. Plugins load once at startup, and
    resuming the same conversation does not reload them; it must be a new session.
-6. **CapCut was open during a write.** The single most common cause of a broken draft.
+6. **`API Error: Connection refused - a firewall or proxy may be blocking it`.** This is
+   Claude Code failing to reach Anthropic, not the pipeline. Reinstalling and re-running do
+   nothing. **Ask about a VPN first** - this team uses VPNs for CapCut in regions where it
+   is blocked, and one that routes or blocks `api.anthropic.com` produces exactly this.
+   Have them disable it, or enable it only while CapCut is open and never during a build.
+   Then consider corporate/school firewalls and antivirus doing HTTPS inspection. To
+   confirm, at the POWERSHELL prompt with Claude closed:
+   `curl.exe -s -o NUL -w "%{http_code}" https://api.anthropic.com/v1/models`
+7. **CapCut was open during a write.** The single most common cause of a broken draft.
    Have them close it and run `python _state/post_session_fix.py "<draft folder>"`.
-7. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
+8. **The install failed on SSH.** `README.md` step one — the `insteadOf` line. Claude Code
    clones plugins over SSH even for a public repo, and a machine with no GitHub key fails
    with "Host key verification failed".
-8. **A font is missing or misnamed.** Both fonts ship and install automatically, so this
+9. **A font is missing or misnamed.** Both fonts ship and install automatically, so this
    should be rare - re-running the installer line fixes it. Awelier must end up registered
    as `MADE Awelier PERSONAL USE ...`; if it registered under its FILENAME instead
    (`MADEAwelierPERSONALUSE-Bold`), CapCut will not find the family and the title renders
    wrong. `kit/fonts/fontnames.json` is what prevents that.
-9. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
-10. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
+10. **The template was never opened in CapCut.** Everything builds, nothing renders styled.
+11. **Tenor stopped returning memes.** `python _state/tenor_fetch.py --selftest` says which
    link in the chain broke.
 
-`python _state/doctor.py` catches 1, 6, 8 and 9 outright. Ask for its full output before
+`python _state/doctor.py` catches 1, 7, 9 and 10 outright. It checks the kit, not connectivity, so it catches none of the network failures. Ask for its full output before
 theorising.
 
 ## The thing worth protecting
