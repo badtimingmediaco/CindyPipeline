@@ -57,6 +57,16 @@ bare plugin name reports "not found".
 
 Updates need a Claude Code restart to take effect. Tell editors that when you ship one.
 
+**Wait ~5 minutes after pushing before telling anyone to re-run.** The installer is fetched
+from `raw.githubusercontent.com`, which serves a cached copy for a few minutes after a push
+- measured at ~200 seconds. An editor who runs the one-liner immediately after you push a
+fix gets the OLD script, silently, and reports that your fix did not work. Confirm the new
+content is live before you tell them:
+
+```bash
+curl -s "https://raw.githubusercontent.com/badtimingmediaco/CindyPipeline/main/install.ps1?cb=$(date +%s)" | grep -c "<something new>"
+```
+
 ### Your side of an update
 
 Bump `version` in `.claude-plugin/plugin.json` (and the `version:` line in
