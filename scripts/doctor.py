@@ -404,6 +404,20 @@ def main():
         check("SFX bank matches sfx_map.json exactly", False,
               f"map: {os.path.exists(sfx_map_p)}  bank: {os.path.isdir(bank)}")
 
+    # Not fatal: a build still runs, it just pauses partway through Stage 1 to download
+    # several hundred MB - which is exactly the ambush this warning exists to prevent.
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import warm_models
+        have = warm_models.cached_models()
+        cached = warm_models.DEFAULT_MODEL in have
+        check(f"Whisper model '{warm_models.DEFAULT_MODEL}' downloaded", cached,
+              f"cached: {', '.join(have)}" if cached
+              else ("not cached - your first build will pause to download it.\n"
+                    "Fetch it now with: python _state/warm_models.py"), fatal=False)
+    except Exception as e:
+        check("Whisper model downloaded", False, f"could not check: {e}", fatal=False)
+
     memes = os.path.join(pipe, "04_assets", "memes", "bank")
     n = len(os.listdir(memes)) if os.path.isdir(memes) else 0
     check("Meme bank present", n > 0, f"{n} clips in {memes}", fatal=False)

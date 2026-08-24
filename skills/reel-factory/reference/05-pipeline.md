@@ -6,7 +6,12 @@
 **Stage 0 — Doctor.** capcut doctor; resolve paths; fonts present; sfx_map matches
 bank; template draft + donor JSONs + sample layers present; CapCut closed. Any
 failure → report and STOP.
-**Stage 1 — Analyze.** ffprobe the input. faster-whisper (word_timestamps=True) →
+**Stage 1 — Analyze.** ffprobe the input. faster-whisper — **use the model named in
+`_state/warm_models.py` (`small.en`); do not pick a different one.** Four editors on four
+models produce four different transcripts, and every sticker's exact words and every asset's
+timing are anchored to that transcript. It is pre-downloaded during setup, so transcription
+should never pause to fetch weights — if it does, either the model name is wrong or the
+cache is missing, and `python _state/warm_models.py` fixes it. With `word_timestamps=True` →
 words.json + transcript. Scene-detect the cuts. **Extract a frame contact sheet of
 the input** (tile ~16 frames) and LOOK at it: framing, where her face/hands sit,
 mic position — this calibrates safe zones. Then do a **written transcript analysis**

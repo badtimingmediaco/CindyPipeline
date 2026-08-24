@@ -42,7 +42,8 @@ KIT_MAP = [
     ("state",            "_state"),
 ]
 SCRIPTS = ["house_layout.py", "verify_build.py", "tenor_fetch.py", "post_session_fix.py",
-           "enforce_track_order.py", "preview_composite.py", "doctor.py", "resolve_input.py"]
+           "enforce_track_order.py", "preview_composite.py", "doctor.py", "resolve_input.py",
+           "warm_models.py"]
 
 log = []
 
@@ -217,8 +218,25 @@ def main():
         hits, ev = relink_template_media(dst_tpl, media)
         say(f"   sample audio relinked in {hits} file(s)\n   {ev}")
 
-    # 4 - what only a human can do -----------------------------------------
-    say("\n4. ONE manual step remains")
+    # 4 - the Whisper model -------------------------------------------------
+    # Do this HERE, where a wait is expected, rather than letting it ambush the editor
+    # partway through their first real build.
+    say("\n4. Whisper model")
+    say("   Fetching it now so your first build does not stall on a download mid-way.")
+    try:
+        import subprocess as _sp
+        r = _sp.run([sys.executable, os.path.join(HERE, "warm_models.py")],
+                    capture_output=True, text=True, timeout=1800)
+        for line in (r.stdout or "").splitlines():
+            say("  " + line)
+        if r.returncode != 0:
+            say("   Not fatal - the rest of setup is fine. Fetch it later with:")
+            say("     python _state/warm_models.py")
+    except Exception as e:
+        say(f"   skipped: {e}")
+
+    # 5 - what only a human can do -----------------------------------------
+    say("\n5. ONE manual step remains")
     say("   Open CZ_TEMPLATE in CapCut once, while online. CapCut then downloads the")
     say("   Markerist font, the torn-paper effect and the caption assets into its own")
     say("   local cache. Those live inside CapCut, not on disk, so no kit can ship")
