@@ -44,7 +44,7 @@ KIT_MAP = [
 SCRIPTS = ["house_layout.py", "verify_build.py", "tenor_fetch.py", "post_session_fix.py",
            "enforce_track_order.py", "preview_composite.py", "doctor.py", "resolve_input.py",
            "warm_models.py", "build.py", "visual_gate.py", "meme_qa.py", "meme_sheet.py",
-           "meme_catalog.json", "THE_METHOD.md"]
+           "meme_catalog.json", "THE_METHOD.md", "LEARNINGS-round5.md"]
 
 # The build engine, shipped as a package. Code is ALWAYS refreshed on setup, unlike kit
 # content which is preserved: the audit that produced version blueberry found this

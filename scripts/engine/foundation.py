@@ -155,11 +155,13 @@ def build(sp, draft, verbose=True):
                                 "title.gap_after names %r, which is not a title row "
                                 "(rows found: %s)" % (nb, sorted(rowinfo)))
                         nmat, nseg, ntpl = rowinfo[nb]
-                        nx = measure.gap_after_x(
+                        nx, tgap = measure.gap_after_x(
                             nmat, nb, nseg["clip"]["transform"]["x"],
                             nseg["clip"]["scale"]["x"], ntpl,
-                            mat, new, s["clip"]["scale"]["x"], (mid in tpls),
-                            HL.TITLE_WORD_GAP_PX)
+                            mat, old, new, s["clip"]["transform"]["x"],
+                            s["clip"]["scale"]["x"], (mid in tpls))
+                        say("  word gap  %r after %r: preserving the template's %.1fpx"
+                            % (new, nb, tgap))
                         if abs(nx - s["clip"]["transform"]["x"]) > 1e-4:
                             s["clip"]["transform"]["x"] = nx
                             moved += 1

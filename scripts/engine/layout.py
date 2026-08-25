@@ -23,6 +23,20 @@ import house_layout as HL          # noqa: E402  the measured laws, unmodified
 
 ANNOTATE = HL.ANNOTATE
 place_sticker = HL.place_sticker
+
+# Marks whose ARTWORK IS NOT THE MARK. `place_sticker_on()` fits a sticker's whole ink box
+# to the target, which is correct only when the ink is the mark. `circle` draws a small
+# flat ellipse with four arrows pointing at it from above: the ink is 0.579 x 0.471 of the
+# canvas but the ellipse alone is roughly the bottom half of that, so fitting the ink to
+# "9.4 / 10" rendered an ellipse far too small, sitting low. It shipped twice.
+#
+# `circle_sign` is a plain hand-drawn oval (ink 0.814 x 0.646, no decoration) and is the
+# correct mark for encircling a value.
+DECORATED_MARKS = {
+    "circle": "ellipse plus four arrows above it - the ink is not the mark. "
+              "Use circle_sign to encircle a value.",
+    "highlight_box": "box plus a curved arrow entering from the top left.",
+}
 V1_VOLUME = HL.V1_VOLUME
 SUCCESS_VOLUME = HL.SUCCESS_VOLUME
 

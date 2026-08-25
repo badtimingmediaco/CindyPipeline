@@ -29,6 +29,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from engine import measure          # noqa: E402
 
 CW, CH = 1080, 1920
+# Fail INSIDE the real frame edge. The width model is an estimate even after the stroke
+# and paper corrections, so the gate is deliberately stricter than the canvas: a false
+# alarm costs a look, a false pass costs a revision round.
+MARGIN = 25
 # ONE definition of each measurement constant and helper, imported - not a second copy.
 # Two copies of a measured value is how they come to disagree: preview_composite.py had
 # its own width constant, drew title boxes 3x too wide, and reported phantom collisions.
@@ -93,8 +97,16 @@ def text_items(d):
                 f = ImageFont.truetype(fpath, 100)
                 lines = body.split("\n")
                 bb = [f.getbbox(l) for l in lines]
-                wpx = max((x[2] - x[0]) for x in bb) / 100.0 * size * k * sc
                 hpx = sum((x[3] - x[1]) for x in bb) / 100.0 * size * k * sc * 1.25
+                # What the VIEWER sees, not what the glyphs measure. See measure.py:
+                # the stroke, the shadow and the paper graphic are all real width.
+                if is_tpl:
+                    ai = tt[mid]["text_info_resources"][0].get("attach_info") or {}
+                    wpx = measure.paper_label_width_px(ai, sc)
+                    if not wpx:
+                        wpx = measure.rendered_width_px(fpath, body, size, sc, True)
+                else:
+                    wpx = measure.rendered_width_px(fpath, body, size, sc, False)
             out.append(dict(track=tr.get("name") or "", t=(a, b), text=body, tpl=is_tpl,
                             font=fpath, size=size, scale=sc, x=tf["x"], y=tf["y"],
                             w=wpx, h=hpx))
@@ -147,6 +159,10 @@ def main():
     ap.add_argument("draft")
     ap.add_argument("--out", default="gate.png")
     ap.add_argument("--cols", type=int, default=5)
+    ap.add_argument("--every", type=int, default=0,
+                    help="render every N frames instead of only asset starts; "
+                         "--every 15 is a frame every half second")
+    ap.add_argument("--tile", type=int, default=330)
     a = ap.parse_args()
 
     d = load(a.draft)
@@ -169,8 +185,17 @@ def main():
     texts = text_items(d)
     stickers = sticker_items(d)
 
-    moments = sorted({round(x[0], 2) for x in [i["t"] for i in texts]}
-                     | {round(m[0], 2) for m in media})
+    if a.every:
+        # Round 5: rendering only the moments an asset STARTS missed every defect that
+        # appeared mid-asset. This walks the whole video on a fixed stride instead.
+        step = a.every / 30.0
+        dur = (d.get("duration") or 0) / 1e6 or 60.0
+        n = int(dur / step) + 1
+        moments = [round(i * step, 2) for i in range(n)]
+    else:
+        moments = sorted({round(x[0], 2) for x in [i["t"] for i in texts]}
+                         | {round(m[0], 2) for m in media}
+                         | {round(s2["t"][0], 2) for s2 in stickers})
     fails = []
 
     tiles = []
@@ -230,9 +255,10 @@ def main():
                 continue
             box = draw_text(img, it)
             boxes.append((it, box))
-            if box[0] < 0 or box[2] > CW:
+            if box[0] < MARGIN or box[2] > CW - MARGIN:
                 fails.append(f"t={t:5.2f} OFF-FRAME horizontally: {it['text']!r} "
-                             f"spans {box[0]:.0f}..{box[2]:.0f} of {CW}")
+                             f"spans {box[0]:.0f}..{box[2]:.0f} of {CW} "
+                             f"(safe area {MARGIN}..{CW - MARGIN})")
             if box[1] < 0 or box[3] > CH:
                 fails.append(f"t={t:5.2f} OFF-FRAME vertically: {it['text']!r}")
         for i in range(len(boxes)):
@@ -243,7 +269,7 @@ def main():
                 if ox > 12 and oy > 12:
                     fails.append(f"t={t:5.2f} TEXT OVERLAP: {ia['text']!r} x {ib['text']!r} "
                                  f"({ox:.0f}x{oy:.0f}px)")
-        img.thumbnail((330, 586))
+        img.thumbnail((a.tile, a.tile * 1920 // 1080))
         tiles.append((t, img))
 
     cols = a.cols

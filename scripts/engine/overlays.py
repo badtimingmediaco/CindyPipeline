@@ -11,34 +11,55 @@ There is now one engine. A new video is a spec file, not a copy of this module.
 """
 import os
 
-from . import capcutcli, draftio, layout as HL, materials, measure, paths, spec as specmod
+from . import (capcutcli, draftio, layout as HL, materials, measure, paths,
+               spec as specmod, timecode)
 
 FRAME = 1.0 / 30.0
 
 
-def close_gaps(beats, max_gap=0.26):
-    """Butt adjacent overlays together - no 1-5 frame slivers between assets.
+MAX_GAP_FRAMES = 5.0
 
-    A two-frame hole between one meme ending and the next starting reads as a flicker.
-    Only gaps small enough to have been unintentional are closed; a deliberate empty beat
-    is left alone. Applied per layer so a meme is never stretched to meet an unrelated
-    text label.
+
+def close_gaps(beats, fps=30.0, max_gap_frames=MAX_GAP_FRAMES):
+    """Butt adjacent overlays together when the gap is under 5 frames.
+
+    The owner's rule, exactly: *if the gap between two assets is less than 5 frames,
+    extend the former asset to end at the exact frame the latter starts.* A two-frame hole
+    between one meme ending and the next starting reads as a flicker; five frames or more
+    is a deliberate beat and is left alone.
+
+    "Exact" matters. Berry closed to `b.start` but neither end was frame-quantised, so two
+    assets that should have butted up differed by a fraction of a frame and left the
+    sliver anyway. Both ends are snapped to the frame grid first.
+
+    Applied per layer, so a meme is never stretched to meet an unrelated text label.
     """
+    from . import timecode as TC
     closed = 0
     for want_media in (True, False):
         grp = sorted([b for b in beats if ("asset" in b) == want_media],
                      key=lambda x: x["t"][0])
+        for b in grp:
+            b["t"] = [TC.snap(b["t"][0], fps), TC.snap(b["t"][1], fps)]
         for a, b in zip(grp, grp[1:]):
-            gap = b["t"][0] - a["t"][1]
-            if 0 < gap <= max_gap:
+            gap_f = TC.frames_between(a["t"][1], b["t"][0], fps)
+            if 0 < gap_f < max_gap_frames:
                 a["t"] = [a["t"][0], b["t"][0]]
                 closed += 1
     return closed
 
 
 def _sfx_hits(beats, end, lead_ins):
-    # lead_ins arrive from JSON as lists; hits below are tuples, and Python will not
-    # order a list against a tuple. Normalise before anything sorts them.
+    """Every SFX hit in the video.
+
+    `lead_ins` (spec key `sfx_hits`, or the older `lead_in_sfx`) are STANDALONE hits with
+    no asset attached. They exist because a semantic sound has to land on the WORD, not on
+    the clause: `error.MP3` belongs on "wrong" at 38:10, and the text beat it relates to
+    starts at 36:15 - 1.7 seconds earlier. Attaching it to the beat put it in the wrong
+    place, and it read as unmotivated.
+    """
+    # These arrive from JSON as lists; hits below are tuples, and Python will not order a
+    # list against a tuple. Normalise before anything sorts them.
     hits = [tuple(h) for h in lead_ins]
     for b in beats:
         if b.get("sfx"):
@@ -87,7 +108,7 @@ def place_sfx(draft, beats, end, lead_ins):
         ends[idx] = t0 + dur
         capcutcli.cli("add-audio", draft,
                       os.path.join(paths.SFXDIR, f).replace("\\", "/"),
-                      "%s" % t0, "%.3f" % dur, "--track-name", "sfx%d" % (idx + 1))
+                      "%.6f" % t0, "%.6f" % dur, "--track-name", "sfx%d" % (idx + 1))
     return len(ordered), len(ends)
 
 
@@ -101,6 +122,12 @@ def solve_annotation(card_png, ann, seg_scale, seg_y, allow_uncached=False):
     cx, cy, w_px = measure.card_region_target(card_png, ann["region"], seg_scale, seg_y,
                                               pad=ann.get("pad", 1.18),
                                               place=ann.get("place", "on"))
+    if ann["mark"] in HL.DECORATED_MARKS and not ann.get("i_know_its_decorated"):
+        raise SystemExit(
+            "annotation mark %r cannot be auto-placed: %s\nEither pick the undecorated "
+            "mark, or set \"i_know_its_decorated\": true to accept that the whole artwork "
+            "- decoration included - is what gets fitted to the region."
+            % (ann["mark"], HL.DECORATED_MARKS[ann["mark"]]))
     rid = HL.ANNOTATE[ann["mark"]]
     art = measure.sticker_art(rid)
     if art is None:
@@ -124,13 +151,21 @@ def build(sp, draft, allow_uncached=False, verbose=True):
                          "its next autosave destroys this build. Quit CapCut and re-run.")
 
     specmod.require_valid(sp)
+    fps = timecode.fps_of(draft)
     beats = [dict(b) for b in sp["beats"]]
     for b in beats:
         if b.get("asset"):
             b["path"] = paths.resolve_asset(b["asset"])
         b.setdefault("band", HL.default_band(b["kind"]))
-    nclosed = close_gaps(beats)
-    say("closed %d sliver gap(s)" % nclosed)
+        # A spec may write times as HH:MM:SS:FF or as seconds; normalise once, here.
+        b["t"] = [timecode.to_seconds(v, fps) for v in b["t"]]
+        if b.get("label_t"):
+            b["label_t"] = [timecode.snap(timecode.to_seconds(v, fps), fps)
+                            for v in b["label_t"]]
+        for a in (b.get("annotate") or []):
+            a["t"] = [timecode.to_seconds(v, fps) for v in a["t"]]
+    nclosed = close_gaps(beats, fps)
+    say("closed %d gap(s) under %g frames (fps=%g)" % (nclosed, close_gaps.__defaults__[1], fps))
 
     end = float(sp["end"])
     draftio.backup(draft, sp["name"] + "_pre_overlays")
@@ -159,8 +194,12 @@ def build(sp, draft, allow_uncached=False, verbose=True):
                 % (os.path.basename(b["path"]), dur, sdur))
             dur = sdur
             b["t"] = [b["t"][0], round(b["t"][0] + dur, 4)]
+        # SIX decimals, not three. A frame is 0.033333s; rounding a duration to the
+        # nearest millisecond can push an asset up to 500us past the start of the next
+        # one, which then reports as a spatial collision and, on screen, as the 1-5 frame
+        # sliver the owner keeps catching. CapCut stores microseconds - give it what it stores.
         r = capcutcli.cli("add-video", draft, b["path"].replace("\\", "/"),
-                          "%s" % b["t"][0], "%.3f" % dur,
+                          "%.6f" % b["t"][0], "%.6f" % dur,
                           "--track-name", "gfx_%d" % b["lane"])
         if not r.get("ok"):
             say("  ! add-video failed", b["path"], r)
@@ -174,7 +213,9 @@ def build(sp, draft, allow_uncached=False, verbose=True):
         % capcutcli.sync_snapshots(draft))
 
     # ---- 2. SFX
-    nhits, ntracks = place_sfx(draft, beats, end, sp.get("lead_in_sfx", []))
+    standalone = [[timecode.to_seconds(t, fps), f] for t, f in
+                  (sp.get("sfx_hits") or sp.get("lead_in_sfx") or [])]
+    nhits, ntracks = place_sfx(draft, beats, end, standalone)
     say("placed %d SFX hits across %d tracks" % (nhits, ntracks))
 
     # ---- 3. structural pass: geometry solved, every text layer cloned
@@ -186,10 +227,15 @@ def build(sp, draft, allow_uncached=False, verbose=True):
     by_id = {s["id"]: s for t in d["tracks"] for s in t["segments"]}
 
     texts, widths, annots = [], [], []
+    beat_span = [0.0, 1e9]
     last_label_y = 0.36
     n_logos = sum(1 for b in beats if b["kind"] == "logo")
 
     def add_label(text, t_pair, y):
+        # Clamp into the beat that owns it. close_gaps moves a beat's edges to the frame
+        # grid; a label_t written by hand does not move with it, and a label that outlives
+        # its card overlaps the next label.
+        t_pair = [max(t_pair[0], beat_span[0]), min(t_pair[1], beat_span[1])]
         seg, wpx = materials.clone_sticker(d, donor_seg, donor_tpl, text,
                                            t_pair[0], t_pair[1], 0.0, y)
         texts.append(seg)
@@ -198,6 +244,7 @@ def build(sp, draft, allow_uncached=False, verbose=True):
     for b in beats:
         t_in, t_out = b["t"]
         kind = b["kind"]
+        beat_span[:] = [t_in, t_out]
 
         if b.get("seg_id"):
             s = by_id.get(b["seg_id"])

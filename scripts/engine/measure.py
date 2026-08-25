@@ -36,8 +36,41 @@ def pil_units(font_path, text):
 
 
 def text_width_px(font_path, text, size, scale=1.0, template=False):
-    """Rendered width in canvas pixels."""
+    """GLYPH width in canvas pixels. Not what the viewer sees - see rendered_width_px."""
     return pil_units(font_path, text) * size * K_PLAIN * (K_TPL if template else 1.0) * scale
+
+
+# What CapCut adds on top of the glyphs, and version berry's model ignored entirely.
+# This is why a row measured at 780px rendered past 1080 and the gate still said PASS.
+STROKE_EM = 0.08        # `border_width` on her title rows, applied BOTH sides
+SHADOW_PX = 5.0         # `shadow_distance`, at -45 degrees
+
+# The torn-paper graphic is wider than the text it carries. Measured across three shipped
+# labels (649.77 / 754.59 / 864.41 attach-widths against their renders) the paper runs
+# ~1.37x the text box. Rounded UP deliberately: a gate must over-estimate, because a false
+# alarm costs a look and a false pass costs a revision round.
+PAPER_PAD = 1.40
+
+
+def rendered_width_px(font_path, text, size, scale=1.0, template=False,
+                      stroke_em=STROKE_EM, shadow_px=SHADOW_PX):
+    """What the viewer actually sees: glyphs + stroke on both sides + drop shadow."""
+    glyphs = text_width_px(font_path, text, size, scale, template)
+    em = size * K_PLAIN * (K_TPL if template else 1.0) * scale
+    return glyphs + 2.0 * stroke_em * em + shadow_px
+
+
+def paper_label_width_px(attach_info, seg_scale, pad=PAPER_PAD):
+    """Rendered width of a torn-paper sticker label, from CapCut's OWN measurement.
+
+    `attach_info.original_size_width` is CapCut's number for the text box, and the
+    template's internal clip scale multiplies it before the segment's scale does. Berry
+    used osw x seg_scale and dropped the internal 2.4395 on some paths, and never
+    accounted for the paper graphic extending past the text at all.
+    """
+    osw = attach_info.get("original_size_width", 0.0)
+    inner = ((attach_info.get("clip") or {}).get("scale") or {}).get("x", 1.0)
+    return osw * inner * seg_scale * pad
 
 
 def content_of(mat):
@@ -71,26 +104,38 @@ def fits_donor(child_mat, new_text):
 
 
 def gap_after_x(prev_mat, prev_text, prev_x, prev_scale, prev_tpl,
-                new_mat, new_text, new_scale, new_tpl, gap_px):
-    """transform.x placing `new_text` a fixed gap after `prev_text`'s right edge.
+                new_mat, old_text, new_text, old_x, new_scale, new_tpl):
+    """transform.x placing `new_text` after `prev_text` at THE TEMPLATE'S OWN GAP.
 
-    This is the rule for two title words sharing a line. The obvious alternative -
-    inheriting the x of the word being replaced - is wrong because transform.x is a
-    CENTRE: a longer replacement grows leftwards into the word before it, which is how
-    "Claude" and "catch" once read as one smashed word. Preserving the old LEFT edge is
-    also wrong, in the other direction: it reproduces the template's spacing for a word of
-    a different length and pushes the replacement toward the frame edge.
+    The rule for two title words sharing a line. Two wrong answers came first:
 
-    Solving from the neighbour's measured right edge is correct at any word length, and it
-    is why the gap can be a house constant instead of a per-title hand-solve.
+      * inherit the replaced word's x - transform.x is a CENTRE, so a longer replacement
+        grows leftwards into the word before it. "Claude" and "catch" read as one word.
+      * a fixed constant (`TITLE_WORD_GAP_PX = 34.0`) - which looked measured but was
+        measured IN THE MODEL'S UNITS off a render whose true gap was about 6px. It
+        encoded the model's own error and the words touched again.
+
+    The fix is to make the quantity RELATIVE. Measure the gap the designer used between
+    `prev_text` and the ORIGINAL `old_text`, in model units, and reproduce that same
+    model-space gap for the replacement. Whatever the model's absolute error, it appears on
+    both sides and very largely cancels - so the rendered gap comes out looking like the
+    designer's, without ever knowing the true pixel width.
+
+    This is the general lesson for any quantity built on an imperfect measurement: prefer a
+    RATIO or a DIFFERENCE against a known-good reference over an absolute.
     """
     fp_p, size_p = style_font(prev_mat)
     fp_n, size_n = style_font(new_mat)
     wp = text_width_px(fp_p, prev_text, size_p, prev_scale, prev_tpl)
-    wn = text_width_px(fp_n, new_text, size_n, new_scale, new_tpl)
+    w_old = text_width_px(fp_n, old_text, size_n, new_scale, new_tpl)
+    w_new = text_width_px(fp_n, new_text, size_n, new_scale, new_tpl)
+
     prev_right = CANVAS_W / 2.0 + prev_x * (CANVAS_W / 2.0) + wp / 2.0
-    new_centre = prev_right + gap_px + wn / 2.0
-    return round((new_centre - CANVAS_W / 2.0) / (CANVAS_W / 2.0), 4)
+    old_left = CANVAS_W / 2.0 + old_x * (CANVAS_W / 2.0) - w_old / 2.0
+    template_gap = old_left - prev_right          # what the designer chose, model units
+
+    new_centre = prev_right + template_gap + w_new / 2.0
+    return round((new_centre - CANVAS_W / 2.0) / (CANVAS_W / 2.0), 4), round(template_gap, 1)
 
 
 def left_aligned_x(child_mat, old_text, new_text, old_x, scale=1.0, template=True):

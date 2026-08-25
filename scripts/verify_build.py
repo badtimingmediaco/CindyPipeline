@@ -10,6 +10,7 @@ Usage: python verify_build.py <draft_dir> [--plan <plan.md>]
 """
 import json, os, sys, subprocess, collections
 
+LONGLIVED_S = 4.0      # a card held longer than this is worth a look
 FAILS = []
 def check(name, ok, evidence=""):
     print(f"  [{'PASS' if ok else 'FAIL'}] {name}")
@@ -354,6 +355,26 @@ def main(draft):
           f"canonical={ch} DIVERGED={diverged}" if diverged else
           f"canonical={ch}, {len(copies)} mirror(s) match "
           f"({', '.join(os.path.relpath(p, draft) for p in copies)})")
+
+    # A card alive for a long time while other layers change over it is the pacing smell
+    # the owner called out: the subagent card held for 9.3s carrying four bullet lines
+    # while four labels fired across it. A card is a unit of ATTENTION, not of information.
+    # Informational, not a failure - a comparison card is legitimately long-lived.
+    vids_all = {v["id"]: v for v in d["materials"].get("videos", [])}
+    longlived = []
+    for tr in d["tracks"]:
+        if tr["type"] != "video" or (tr.get("name") or "") == "V1":
+            continue
+        for s2 in tr["segments"]:
+            secs = s2["target_timerange"]["duration"] / 1e6
+            if secs > LONGLIVED_S:
+                m = vids_all.get(s2["material_id"]) or {}
+                longlived.append((os.path.basename(m.get("path", "?")), round(secs, 1)))
+    if longlived:
+        print(f"  [INFO] long-lived assets (> {LONGLIVED_S}s) - check nothing is changing "
+              f"over them: {sorted(longlived, key=lambda x: -x[1])}")
+    else:
+        print(f"  [INFO] no overlay held longer than {LONGLIVED_S}s")
 
     segs_total = sum(len(t["segments"]) for t in d["tracks"])
     dur_s = (d.get("duration") or 0) / 1e6

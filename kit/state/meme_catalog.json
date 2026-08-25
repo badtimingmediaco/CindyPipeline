@@ -1,59 +1,322 @@
 {
-  "_README": [
-    "Curated BY EYE from _state/meme_sheet.py output (3 frames per clip), 2026-08-25.",
-    "A burned-caption detector was attempted first and did not work - it ranked a clip",
-    "with no text above one with a full caption, because it was measuring cartoon",
-    "linework. The bank is 37 clips; looking once and recording the answer beats a check",
-    "that lies. Re-run meme_sheet.py and update this file whenever clips are added.",
-    "",
-    "RULE (owner, 2026-08-25): ANY visible burned-in text disqualifies a clip. That",
-    "includes a meme's own famous caption - GREAT SUCCESS and THE RESULTS ARE IN are",
-    "both out. This overrides the earlier 'iconic text is fine' learning.",
-    "",
-    "Only clips with use:'ok' may be placed. 'crop' means it is usable but must be run",
-    "through meme_qa.py --fix-bars first and sourced from 04_assets/memes/bank_clean/."
-  ],
-  "banned_burned_text": {
-    "borat_great_success": "GREAT SUCCESS burned in",
-    "drake_nah_hotline": "NAH burned in, plus vevo watermark and pillarbox bars",
-    "dumpster_fire_everythings_fine": "EVERYTHING'S FINE burned in",
-    "maury_the_results_are_in": "THE RESULTS ARE IN.... burned in",
-    "viral_views_counter": "view counts as text, and a pure white background",
-    "zoolander_center_for_ants_scene": "What is this?! / A center for ANTS?! burned in"
+ "_README": [
+  "Curated BY EYE from _state/meme_sheet.py output (3 frames per clip), 2026-08-25.",
+  "A burned-caption detector was attempted first and did not work - it ranked a clip",
+  "with no text above one with a full caption, because it was measuring cartoon",
+  "linework. The bank is 37 clips; looking once and recording the answer beats a check",
+  "that lies. Re-run meme_sheet.py and update this file whenever clips are added.",
+  "",
+  "RULE (owner, 2026-08-25): ANY visible burned-in text disqualifies a clip. That",
+  "includes a meme's own famous caption - GREAT SUCCESS and THE RESULTS ARE IN are",
+  "both out. This overrides the earlier 'iconic text is fine' learning.",
+  "",
+  "Only clips with use:'ok' may be placed. 'crop' means it is usable but must be run",
+  "through meme_qa.py --fix-bars first and sourced from 04_assets/memes/bank_clean/.",
+  "",
+  "SEARCH RULE (2026-08-25): search the ACTION the sentence describes, not an abstract",
+  "noun lifted from it. Two rejections this round were category matches - 'denied' for a",
+  "line about removing, 'conspiracy board' for a line about grading - and both looked",
+  "plausible precisely because the category was right and the action was not."
+ ],
+ "banned_burned_text": {
+  "borat_great_success": "GREAT SUCCESS burned in",
+  "drake_nah_hotline": "NAH burned in, plus vevo watermark and pillarbox bars",
+  "dumpster_fire_everythings_fine": "EVERYTHING'S FINE burned in",
+  "maury_the_results_are_in": "THE RESULTS ARE IN.... burned in",
+  "viral_views_counter": "view counts as text, and a pure white background",
+  "zoolander_center_for_ants_scene": "What is this?! / A center for ANTS?! burned in"
+ },
+ "banned_cutout": {
+  "mind_blown_head_explosion": "white-background cutout - reads as a pasted box",
+  "spider_crawling_white": "white-background cutout"
+ },
+ "clips": {
+  "birdman_rubbing_hands_closeup": {
+   "use": "ok",
+   "depicts": "man rubbing hands, scheming anticipation",
+   "good_for": [
+    "wanting it",
+    "about to get something",
+    "scheming"
+   ]
   },
-  "banned_cutout": {
-    "mind_blown_head_explosion": "white-background cutout - reads as a pasted box",
-    "spider_crawling_white": "white-background cutout"
+  "charlie_day_conspiracy_board": {
+   "use": "ok",
+   "depicts": "frantic man at a red-string conspiracy board",
+   "good_for": [
+    "overanalysing",
+    "connecting dots",
+    "losing the plot"
+   ],
+   "not_for": [
+    "grading or scoring - it depicts EXPLAINING/overanalysing. Matching on the shared category 'intellectual activity' is how it got placed on a grading beat."
+   ]
   },
-  "clips": {
-    "birdman_rubbing_hands_closeup": {"use": "ok", "depicts": "man rubbing hands, scheming anticipation", "good_for": ["wanting it", "about to get something", "scheming"]},
-    "charlie_day_conspiracy_board": {"use": "ok", "depicts": "frantic man at a red-string conspiracy board", "good_for": ["overanalysing", "connecting dots", "losing the plot"]},
-    "confused_math_lady": {"use": "ok", "depicts": "woman with maths overlay, baffled", "good_for": ["confusion", "trying to work it out"]},
-    "devito_burning_money": {"use": "crop", "depicts": "DeVito setting cash alight", "good_for": ["wasting money", "burning budget"]},
-    "dicaprio_cheers_gatsby": {"use": "ok", "depicts": "DiCaprio raising a glass, fireworks", "good_for": ["a win", "celebration", "payoff"]},
-    "dicaprio_pointing_at_tv": {"use": "crop", "depicts": "DiCaprio pointing at a screen", "good_for": ["that's the thing", "recognition"]},
-    "dr_evil_air_quotes": {"use": "ok", "depicts": "Dr Evil doing air quotes", "good_for": ["so-called", "supposedly impartial", "scare quotes"]},
-    "eavesdropping_at_the_wall": {"use": "weak", "depicts": "man listening against a wall - a film still, not a recognisable meme", "good_for": []},
-    "fry_take_my_money_clean": {"use": "ok", "depicts": "Fry holding out cash", "good_for": ["shut up and take my money", "buying in"], "note": "the owner called this irrelevant on a 'want the prompts?' beat - only use it where MONEY or paying is literally the subject"},
-    "greek_pillars_columns": {"use": "ok", "depicts": "greek columns, a man gesturing", "good_for": ["pillars", "foundations"]},
-    "homer_backs_into_hedge": {"use": "ok", "depicts": "Homer reversing into a hedge until he vanishes", "good_for": ["disappearing", "backing out", "something going away"]},
-    "huge_document_stack": {"use": "ok", "depicts": "man dropping a huge stack of paper on a desk", "good_for": ["a big summary", "too much context", "the whole document"]},
-    "indiana_jones_warehouse_ending": {"use": "ok", "depicts": "endless warehouse of crates", "good_for": ["lost forever", "buried in storage"]},
-    "kirby_mega_inhale": {"use": "ok", "depicts": "Kirby inhaling everything", "good_for": ["absorbing it all", "taking in the whole context"]},
-    "magnifying_glass_examining": {"use": "ok", "depicts": "man scrutinising through a magnifying glass", "good_for": ["examining", "grading", "scrutiny", "review"]},
-    "michael_scott_grimace": {"use": "ok", "depicts": "Michael Scott wincing", "good_for": ["that didn't work", "cringe", "awkward truth"]},
-    "patrick_building_workbench": {"use": "crop", "depicts": "Patrick at a workbench", "good_for": ["building something", "assembling"]},
-    "peeking_through_blinds_spying": {"use": "crop", "depicts": "man peering through blinds", "good_for": ["spying", "checking on someone"]},
-    "roxbury_bouncer_denied": {"use": "ok", "depicts": "bouncer turning people away", "good_for": ["rejected", "denied entry", "not allowed"]},
-    "scrolling_phone_in_bed_bored": {"use": "ok", "depicts": "two people doomscrolling in bed", "good_for": ["doomscrolling", "wasting time"]},
-    "skeptical_kid_sideeye": {"use": "ok", "depicts": "kid giving a long side-eye", "good_for": ["yeah right", "skepticism", "not buying it"]},
-    "spiderman_pointing_spiderman": {"use": "ok", "depicts": "two identical Spider-Men pointing at each other", "good_for": ["self-reference", "judging itself", "same thing twice"], "note": "the single best match in the bank for self-preference bias"},
-    "spongebob_control_panel_buttons": {"use": "ok", "depicts": "SpongeBob overwhelmed at a control panel", "good_for": ["too many options", "switching settings", "which one do I press"]},
-    "spongebob_imagination_rainbow": {"use": "ok", "depicts": "SpongeBob rainbow hands, imagination", "good_for": ["imagine", "the idea", "possibility"]},
-    "spongebob_patrick_computer_alarmed": {"use": "ok", "depicts": "SpongeBob and Patrick alarmed at a computer", "good_for": ["panic at the screen", "something went wrong"]},
-    "spongebob_rainbow_imagination_hq": {"use": "ok", "depicts": "SpongeBob rainbow, higher quality", "good_for": ["imagine", "the idea"]},
-    "sweating_guy_decision": {"use": "ok", "depicts": "man sweating over a choice", "good_for": ["hard decision", "under pressure"]},
-    "this_is_fine_dog_fire": {"use": "ok", "depicts": "dog drinking coffee in a burning room", "good_for": ["denial", "everything is broken and it doesn't notice", "false confidence"]},
-    "wolfofwallst_money_throw": {"use": "ok", "depicts": "man throwing cash off a boat", "good_for": ["throwing money away", "excess"]}
+  "confused_math_lady": {
+   "use": "ok",
+   "depicts": "woman with maths overlay, baffled",
+   "good_for": [
+    "confusion",
+    "trying to work it out"
+   ]
+  },
+  "devito_burning_money": {
+   "use": "crop",
+   "depicts": "DeVito setting cash alight",
+   "good_for": [
+    "wasting money",
+    "burning budget"
+   ]
+  },
+  "dicaprio_cheers_gatsby": {
+   "use": "ok",
+   "depicts": "DiCaprio raising a glass, fireworks",
+   "good_for": [
+    "a win",
+    "celebration",
+    "payoff"
+   ]
+  },
+  "dicaprio_pointing_at_tv": {
+   "use": "crop",
+   "depicts": "DiCaprio pointing at a screen",
+   "good_for": [
+    "that's the thing",
+    "recognition"
+   ]
+  },
+  "dr_evil_air_quotes": {
+   "use": "ok",
+   "depicts": "Dr Evil doing air quotes",
+   "good_for": [
+    "so-called",
+    "supposedly impartial",
+    "scare quotes"
+   ]
+  },
+  "eavesdropping_at_the_wall": {
+   "use": "weak",
+   "depicts": "man listening against a wall - a film still, not a recognisable meme",
+   "good_for": []
+  },
+  "fry_take_my_money_clean": {
+   "use": "ok",
+   "depicts": "Fry holding out cash",
+   "good_for": [
+    "shut up and take my money",
+    "buying in"
+   ],
+   "note": "the owner called this irrelevant on a 'want the prompts?' beat - only use it where MONEY or paying is literally the subject"
+  },
+  "greek_pillars_columns": {
+   "use": "ok",
+   "depicts": "greek columns, a man gesturing",
+   "good_for": [
+    "pillars",
+    "foundations"
+   ]
+  },
+  "homer_backs_into_hedge": {
+   "use": "ok",
+   "depicts": "Homer reversing into a hedge until he vanishes",
+   "good_for": [
+    "disappearing",
+    "backing out",
+    "something going away"
+   ]
+  },
+  "huge_document_stack": {
+   "use": "ok",
+   "depicts": "man dropping a huge stack of paper on a desk",
+   "good_for": [
+    "a big summary",
+    "too much context",
+    "the whole document"
+   ]
+  },
+  "indiana_jones_warehouse_ending": {
+   "use": "ok",
+   "depicts": "endless warehouse of crates",
+   "good_for": [
+    "lost forever",
+    "buried in storage"
+   ]
+  },
+  "kirby_mega_inhale": {
+   "use": "ok",
+   "depicts": "Kirby inhaling everything",
+   "good_for": [
+    "absorbing it all",
+    "taking in the whole context"
+   ]
+  },
+  "magnifying_glass_examining": {
+   "use": "ok",
+   "depicts": "man scrutinising through a magnifying glass",
+   "good_for": [
+    "examining",
+    "grading",
+    "scrutiny",
+    "review"
+   ]
+  },
+  "michael_scott_grimace": {
+   "use": "ok",
+   "depicts": "Michael Scott wincing",
+   "good_for": [
+    "that didn't work",
+    "cringe",
+    "awkward truth"
+   ]
+  },
+  "patrick_building_workbench": {
+   "use": "crop",
+   "depicts": "Patrick at a workbench",
+   "good_for": [
+    "building something",
+    "assembling"
+   ]
+  },
+  "peeking_through_blinds_spying": {
+   "use": "crop",
+   "depicts": "man peering through blinds",
+   "good_for": [
+    "spying",
+    "checking on someone"
+   ]
+  },
+  "roxbury_bouncer_denied": {
+   "use": "ok",
+   "depicts": "bouncer turning people away",
+   "good_for": [
+    "rejected",
+    "denied entry",
+    "not allowed"
+   ]
+  },
+  "scrolling_phone_in_bed_bored": {
+   "use": "ok",
+   "depicts": "two people doomscrolling in bed",
+   "good_for": [
+    "doomscrolling",
+    "wasting time"
+   ]
+  },
+  "skeptical_kid_sideeye": {
+   "use": "ok",
+   "depicts": "kid giving a long side-eye",
+   "good_for": [
+    "yeah right",
+    "skepticism",
+    "not buying it"
+   ]
+  },
+  "spiderman_pointing_spiderman": {
+   "use": "ok",
+   "depicts": "two identical Spider-Men pointing at each other",
+   "good_for": [
+    "self-reference",
+    "judging itself",
+    "same thing twice"
+   ],
+   "note": "the single best match in the bank for self-preference bias"
+  },
+  "spongebob_control_panel_buttons": {
+   "use": "ok",
+   "depicts": "SpongeBob overwhelmed at a control panel",
+   "good_for": [
+    "too many options",
+    "switching settings",
+    "which one do I press"
+   ]
+  },
+  "spongebob_imagination_rainbow": {
+   "use": "ok",
+   "depicts": "SpongeBob rainbow hands, imagination",
+   "good_for": [
+    "imagine",
+    "the idea",
+    "possibility"
+   ],
+   "note": "acceptable but not tight for 'give it real independence' - the line is literally about FREEDOM, so broken chains is the tighter image. 'Acceptable' and 'tight' are different bars and the owner wants tight."
+  },
+  "spongebob_patrick_computer_alarmed": {
+   "use": "ok",
+   "depicts": "SpongeBob and Patrick alarmed at a computer",
+   "good_for": [
+    "panic at the screen",
+    "something went wrong"
+   ]
+  },
+  "spongebob_rainbow_imagination_hq": {
+   "use": "ok",
+   "depicts": "SpongeBob rainbow, higher quality",
+   "good_for": [
+    "imagine",
+    "the idea"
+   ]
+  },
+  "sweating_guy_decision": {
+   "use": "ok",
+   "depicts": "man sweating over a choice",
+   "good_for": [
+    "hard decision",
+    "under pressure"
+   ]
+  },
+  "this_is_fine_dog_fire": {
+   "use": "ok",
+   "depicts": "dog drinking coffee in a burning room",
+   "good_for": [
+    "denial",
+    "everything is broken and it doesn't notice",
+    "false confidence"
+   ]
+  },
+  "wolfofwallst_money_throw": {
+   "use": "ok",
+   "depicts": "man throwing cash off a boat",
+   "good_for": [
+    "throwing money away",
+    "excess"
+   ]
+  },
+  "chains_breaking_silhouette": {
+   "use": "ok",
+   "depicts": "silhouetted figure, arms raised, a chain snapping between the fists, sunset behind",
+   "good_for": [
+    "freedom",
+    "independence",
+    "breaking free of a constraint"
+   ],
+   "why_chosen": "'give it real independence' is literally about FREEDOM; the spongebob rainbow it replaced was acceptable but not tight. Full-bleed, no burned text, no white pillarbox - the two other chain clips were framed inside a white border and read as a pasted picture."
+  },
+  "simpsons_judges_scorecards": {
+   "use": "ok",
+   "depicts": "Simpsons judging panel behind a JUDGES sign, raising scorecards reading 10",
+   "good_for": [
+    "grading",
+    "scoring",
+    "being marked",
+    "a verdict"
+   ],
+   "duration_s": 0.8,
+   "why_chosen": "the beat is GRADING. charlie_day_conspiracy_board was placed here on a category match - both are 'intellectual activity' - when the actual action is scoring.",
+   "why_this_cut": "the zero-scorecard version of the same scene is funnier for an INDEPENDENT grader, but it only exists at 198x152 and 260x200. At the 430px band height that is a 2.2x upscale and reads as mush. A blurry meme is a defect the owner has already rejected; a slightly less sharp joke is a judgement call. Resolution won.",
+   "note": "only 0.8s - the beat window must be sized to it, not the other way round, or the trim leaves a visible hole before the next asset."
+  },
+  "magician_poof_vanish": {
+   "use": "ok",
+   "depicts": "magician at a table, a burst of smoke, and he is gone",
+   "good_for": [
+    "vanishing",
+    "something being removed",
+    "a clean slate"
+   ],
+   "why_chosen": "'the old context vanishes' - the ACTION is vanishing. This is the clip that replaces roxbury_bouncer_denied, which was matched to the word 'denied' rather than to what the sentence means. Rejected along the way: a POOF-lettered cartoon and two whiteboard clips, all carrying burned text or a service watermark."
   }
+ },
+ "banned_wrong_mapping": {
+  "roxbury_bouncer_denied": "OWNER BAN 2026-08-25: 'super bad, should never be used again.' Placed on 'the old context vanishes', which is about REMOVING, not about rejection - it was matched to the word 'denied' rather than to what the sentence means. A crossed-arms 'no' IS right when the context really is rejection; search the ACTION the sentence describes (separating, chopping, cutting away, removing), never an abstract noun from it."
+ }
 }

@@ -84,7 +84,7 @@ def validate(spec, strict_catalog=True):
     if os.path.exists(paths.MEME_CATALOG):
         c = json.load(open(paths.MEME_CATALOG, encoding="utf-8"))
         catalog = c.get("clips", {})
-        for key in ("banned_burned_text", "banned_cutout"):
+        for key in ("banned_burned_text", "banned_cutout", "banned_wrong_mapping"):
             banned.update(c.get(key, {}))
 
     sfx_bank = set()
