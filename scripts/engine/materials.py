@@ -133,13 +133,29 @@ def find_donors(d, donor_cache, donor_phrase="Make money", shadow_text="how to m
         sticker = (json.load(open(donor_cache, encoding="utf-8")), donor_tpl)
     elif sticker is not None:
         json.dump(sticker[0], open(donor_cache, "w", encoding="utf-8"), ensure_ascii=False)
+    # The shadow donor is whichever title row carries the drop shadow, and it is found by
+    # that PROPERTY, not by its words. Matching a hardcoded string ("how to make") tied the
+    # engine to one video's title: the next reel retitled that row and the build died with
+    # "donor missing: shadow=False". A donor is defined by what it HAS, not what it says.
     shadow = None
-    for _mid, m in tx.items():
-        try:
-            if json.loads(m["content"]).get("text") == shadow_text:
-                shadow = m
-        except Exception:
-            pass
+    if shadow_text:
+        for _mid, m in tx.items():
+            try:
+                if json.loads(m["content"]).get("text") == shadow_text:
+                    shadow = m
+            except Exception:
+                pass
+    if shadow is None:
+        child_ids = {t["text_info_resources"][0]["text_material_id"] for t in tt.values()}
+        for _mid, m in tx.items():
+            if m["id"] in child_ids or not m.get("has_shadow"):
+                continue
+            try:
+                if json.loads(m["content"]).get("text", "").strip():
+                    shadow = m
+                    break
+            except Exception:
+                pass
     if sticker is None or shadow is None:
         raise SystemExit("donor missing: sticker=%s shadow=%s"
                          % (sticker is not None, shadow is not None))

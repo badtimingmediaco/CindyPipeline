@@ -199,17 +199,26 @@ def main():
     fails = []
 
     tiles = []
+    # Sample HALF A FRAME INTO each moment, not exactly on it.
+    #
+    # Moments are rounded to 2dp, so an asset starting at 5.033 was probed at 5.03 - three
+    # milliseconds BEFORE it exists. The gate was rendering the frame preceding several
+    # assets and reporting them clean without ever having drawn them. The same rounding
+    # made two assets appear together at a butt-join, because floating point put one
+    # segment's end at 25.700000000000003.
+    probe = lambda t: t + 1.0 / 60.0
+
     for t in moments:
         img = frame_at(v1, t + 0.05) if v1 else Image.new("RGB", (CW, CH), (40, 40, 40))
         for (aa, bb, m, s) in media:
-            if not (aa <= t < bb):
+            if not (aa <= probe(t) < bb):
                 continue
             p = m.get("path")
             if not p or not os.path.exists(p):
                 continue
             src = p
             if p.lower().endswith((".mp4", ".mov")):
-                off = min(max(0.0, t - aa), max(0.0, bb - aa - 0.05))
+                off = min(max(0.0, probe(t) - aa), max(0.0, bb - aa - 0.05))
                 fd, tmp = tempfile.mkstemp(suffix=".png")
                 os.close(fd)
                 subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{off:.2f}",
@@ -234,7 +243,7 @@ def main():
                     pass
 
         for st in stickers:
-            if not (st["t"][0] <= t < st["t"][1]):
+            if not (st["t"][0] <= probe(t) < st["t"][1]):
                 continue
             art = sticker_art(st["rid"])
             if art is None:
@@ -251,7 +260,7 @@ def main():
 
         boxes = []
         for it in texts:
-            if not (it["t"][0] <= t < it["t"][1]):
+            if not (it["t"][0] <= probe(t) < it["t"][1]):
                 continue
             box = draw_text(img, it)
             boxes.append((it, box))

@@ -1,7 +1,7 @@
 ---
 name: reel-factory
 description: Build a Cindy Zhu reel - turn a descripted talking-head MP4 into a near-finished CapCut draft with title, torn-paper stickers, memes, logos, cards, SFX and CTA. ALWAYS use this skill when the user says "run it" followed by any name. That phrase is this team's command for building a reel - use it even when no such file exists yet, and even when the name sounds like a document, a company or a topic rather than a video. Never search Notion, Drive or the web for a "run it" target; the target is always a video file. Also use for building or editing a reel, fixing an existing CZ_ draft, or when reel setup looks incomplete.
-version: 4.7.0
+version: 5.2.0
 ---
 
 # Cindy Zhu Reel Factory
@@ -41,7 +41,7 @@ If `01_intake` is empty, say so plainly rather than searching elsewhere.
 
 ---
 
-## THE SEVEN RULES THAT ARE ALWAYS IN FORCE
+## THE RULES THAT ARE ALWAYS IN FORCE
 
 These never leave context. Everything else is loaded on demand.
 
@@ -64,6 +64,11 @@ These never leave context. Everything else is loaded on demand.
    summarising JSON by eye. A build is not done until `verify_build.py` prints zero
    failures. A reviewer once printed "all ids unique — PASS" while every copy shared one
    child, because it read the wrong field.
+8. **Never rebuild over a draft that has been delivered or edited.** `build.py`
+   fingerprints what it produced and refuses if the draft has moved since. When it
+   refuses, change the draft name in the spec — do not reach for `--force`, which
+   destroys hand edits unrecoverably. Nine rebuilds over a delivered draft once cost the
+   owner a full day of work. See `reference/07-rules.md` §8B.
 
 **Do not use OpenAI, ChatGPT, Remotion or Hyperframes.** Claude draws every fabricated
 asset itself, with Pillow. See `reference/08-cards.md`.
@@ -80,7 +85,7 @@ Full detail in `reference/05-pipeline.md`. The shape:
 | **1 Analyze** | ffprobe, faster-whisper with word timestamps, scene-detect the cuts, and **look at a frame contact sheet** to calibrate the safe zones on this framing. Then write the transcript analysis. |
 | **2 Ask** | One batched round of questions, only for what the guardrails do not already decide. |
 | **3 Plan** | `03_plans/<name>_plan.md` — title, every sticker, every meme brief, logo moments, SFX schedule, cut-trim table. Everything width-checked and density-checked on paper before touching CapCut. |
-| **4 Execute** | Write `_runs/<name>/spec.json`, then `python _state/build.py <spec>`. Clone `CZ_TEMPLATE` fresh first — never build on top of a previous build. |
+| **4 Execute** | Write `_runs/<name>/spec.json`, then `python _state/build.py <spec> --fresh`. `--fresh` clones `CZ_TEMPLATE` — never build on top of a previous build, and never over a delivered one (rule 8). |
 | **5 Verify** | `enforce_track_order.py` → `verify_build.py` → `visual_gate.py`, **and look at the sheet**. Loop until zero failures. Then write `05_output/<name>/NOTES.md`. |
 
 ### Stage 4 in detail — the spec is the only thing you write
@@ -95,6 +100,10 @@ python _state/build.py _runs/<name>/spec.json --check
 ```bash
 python _state/build.py _runs/<name>/spec.json
 ```
+
+**Times in a spec are seconds.** When the owner *gives* you a time it is `HH:MM:SS:FF`
+— `49:01` means 49 seconds and 1 frame, not 49 minutes. Convert with
+`engine/timecode.py`, reading fps from the project rather than assuming 30.
 
 **A spec may not contain geometry.** No `x`, `y`, `scale`, `target_w`, or anchor — the
 validator hard-fails on them and names the band to use instead. You write clause timings,

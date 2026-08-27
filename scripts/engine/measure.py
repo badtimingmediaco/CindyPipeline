@@ -202,7 +202,7 @@ def card_anchor(card_png, px, py, seg_scale, seg_y):
 
 
 def card_region_target(card_png, region, seg_scale, seg_y, pad=1.18, place="on"):
-    """-> (target_cx, target_cy, target_w_px) for a named region of a card.
+    """-> (target_cx, target_cy, target_w_px, target_h_px) for a card region.
 
     `pad` widens the mark past the text it rings, so a circle encircles the value rather
     than striking through it.
@@ -226,7 +226,8 @@ def card_region_target(card_png, region, seg_scale, seg_y, pad=1.18, place="on")
     elif place == "over":
         py = y0 - 0.4 * (y1 - y0)
     cx, cy = card_anchor(card_png, (x0 + x1) / 2.0, py, seg_scale, seg_y)
-    return cx, cy, (x1 - x0) * fit * seg_scale * pad
+    return (cx, cy, (x1 - x0) * fit * seg_scale * pad,
+            (y1 - y0) * fit * seg_scale * pad)
 
 
 def ink_box(art):

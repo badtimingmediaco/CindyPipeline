@@ -247,6 +247,50 @@ $hasAwelier = $reg.PSObject.Properties | Where-Object { $_.Name -like '*Awelier*
 if ($hasAwelier) { Ok "MADE Awelier registered as '$($hasAwelier.Name)'" }
 else { Bad "MADE Awelier did not register - CapCut will not render the title correctly" }
 
+# ---------------------------------------------------------------- 6. the pipeline
+Step "Setting up your pipeline folder"
+
+# `claude plugin update` refreshes the CACHE. It does not touch the folder the editor
+# actually works in: the engine code, the meme catalog, the SFX map and the learnings all
+# live under ~/Documents/CindyPipeline, and until setup runs they stay at whatever version
+# was installed first. Older versions of this installer ended by TELLING the editor to run
+# setup themselves. A step someone has to remember is a step that gets skipped, and a
+# machine that skips it reports itself up to date while quietly building worse videos than
+# the machine beside it. So it runs here, every time, and it is safe to re-run.
+$script:SetupRan = $false
+$script:PipeHome = Join-Path $env:USERPROFILE 'Documents\CindyPipeline'
+$script:HadPipe  = Test-Path $script:PipeHome
+
+if (-not $script:PluginDir) {
+    Bad "the plugin is not on disk, so the pipeline folder cannot be set up"
+} elseif (-not (Has 'python')) {
+    Bad "python is unavailable, so the pipeline folder cannot be set up"
+} elseif (Get-Process -Name 'CapCut' -ErrorAction SilentlyContinue) {
+    # Setup places the house template into the drafts folder. CapCut never re-reads from
+    # disk while it is open, and its next autosave would write the old draft back over it.
+    Bad "CapCut is OPEN - close it and re-run this installer"
+    Note "Everything else is installed; only the pipeline folder was left untouched."
+} else {
+    $setupPy = Join-Path $script:PluginDir.FullName 'scripts\setup.py'
+    Say "  running setup - on a new machine this also downloads the transcription"
+    Say "  model, which takes a few minutes. Leave it."
+    Say ""
+    # Do NOT wrap this in Run{}: its output is what tells the editor which checks passed.
+    # Drop to Continue so that a stderr line from python is not turned into a thrown
+    # exception by PowerShell 5.1, and judge the result by the exit code instead.
+    $ErrorActionPreference = 'Continue'
+    & python $setupPy
+    $rc = $LASTEXITCODE
+    $ErrorActionPreference = 'Stop'
+    Say ""
+    if ($rc -eq 0) {
+        Ok "pipeline folder ready at $script:PipeHome"
+        $script:SetupRan = $true
+    } else {
+        Bad "setup reported problems (exit $rc) - its output above says which"
+    }
+}
+
 # ---------------------------------------------------------------- done
 Say ""
 Say "  ==================================="
@@ -260,19 +304,38 @@ if ($script:Failed.Count) {
     Write-Host "  ALL DONE" -ForegroundColor Green
 }
 Say ""
-Say "  NEXT - two things, in this order:"
-Say ""
-Say "    1. Open a NEW terminal and run:   claude"
-Say "       Then type:                     /reel-factory:reel-setup"
-Say ""
-Say "       That builds your pipeline folder, finds your CapCut drafts folder and"
-Say "       places the house template. It will tell you if anything is still missing."
-Say ""
-Say "    2. Open CZ_TEMPLATE in CapCut once, while online."
-Say "       CapCut downloads its own fonts and the torn-paper effect at that moment."
-Say "       Nobody can automate this part. Then close CapCut."
-Say ""
-Say "  Then drop a video in 01_intake and tell Claude to run it, naming the video:"
+if ($script:SetupRan) {
+    Say "  NEXT:"
+    Say ""
+    if (-not $script:HadPipe) {
+        # Only a machine that has never had the pipeline needs the CapCut warm-up. On an
+        # upgrade the template is already in CapCut's cache, and repeating the step here
+        # leaves the editor wondering whether they missed something.
+        Say "    1. Open CZ_TEMPLATE in CapCut once, while online, then close it."
+        Say "       CapCut downloads its own fonts and the torn-paper effect at that"
+        Say "       moment, into its own cache. Nobody can automate this part."
+        Say ""
+        Say "    2. Open a NEW terminal and run:   claude"
+    } else {
+        Say "    Open a NEW terminal and run:   claude"
+        Say ""
+        Say "    A new terminal matters: Claude Code reads the plugin when it starts,"
+        Say "    so a session that was already open is still running the old version."
+    }
+    Say ""
+    Say "  Then drop a video in 01_intake and tell Claude to run it, naming the video:"
+} else {
+    Say "  NEXT - the pipeline folder still needs setting up:"
+    Say ""
+    Say "    1. Open a NEW terminal and run:   claude"
+    Say "       Then type:                     /reel-factory:reel-setup"
+    Say ""
+    Say "    2. Open CZ_TEMPLATE in CapCut once, while online, then close it."
+    Say "       CapCut downloads its own fonts and the torn-paper effect at that moment."
+    Say "       Nobody can automate this part."
+    Say ""
+    Say "  Then drop a video in 01_intake and tell Claude to run it, naming the video:"
+}
 Say ""
 Say "      run it mobile app"
 Say ""

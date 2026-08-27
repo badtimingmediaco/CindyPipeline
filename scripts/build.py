@@ -12,6 +12,7 @@ every build. See _state/engine/spec.py for why that is enforced rather than enco
 import argparse
 import json
 import os
+import shutil
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -42,6 +43,12 @@ def main(argv=None):
     ap.add_argument("--allow-uncached", action="store_true",
                     help="place an annotation whose artwork CapCut has not cached; it "
                          "cannot be visually checked, so this is never the default")
+    ap.add_argument("--fresh", action="store_true",
+                    help="clone CZ_TEMPLATE into the draft first (a build must start "
+                         "from a fresh clone - the paper donor gets consumed otherwise)")
+    ap.add_argument("--force", action="store_true",
+                    help="build over a draft that has been edited since the engine made "
+                         "it. This DESTROYS those edits and they are not recoverable.")
     ap.add_argument("--reference", type=float, default=242.0,
                     help="beats-per-80s of the reference reel to compare density against")
     a = ap.parse_args(argv)
@@ -65,12 +72,36 @@ def main(argv=None):
         return 0
 
     dd = draft_dir(sp)
-    if not os.path.isdir(dd):
-        print("draft not found: %s" % dd)
-        return 2
     if capcutcli.capcut_running():
         print("CapCut is RUNNING - quit it first.")
         return 2
+
+    # PROVENANCE GATE. Every safeguard here used to guard the WRITE ("is CapCut closed?")
+    # and none guarded the TARGET ("has this draft moved since I made it?"). On 2026-08-26
+    # that cost the owner a full day of hand edits: nine rebuilds, each from a fresh
+    # template clone, over a draft that had already been delivered. Closed is not the same
+    # as untouched.
+    ok, why = draftio.check_untouched(dd, sp["name"])
+    if not ok and not a.force:
+        print("\nREFUSING TO BUILD")
+        print("  " + why.replace(chr(10), chr(10) + "  "))
+        print("\n  Either build to a new draft name in the spec, or re-run with --force")
+        print("  if you are certain those edits are expendable.")
+        return 3
+    if not ok:
+        print("  ! --force: overwriting a draft that was edited after the engine built it")
+    elif os.path.isdir(dd):
+        print("provenance: %s" % why)
+
+    if a.fresh or not os.path.isdir(dd):
+        tpl = os.path.join(os.path.dirname(dd), "CZ_TEMPLATE")
+        if not os.path.isdir(tpl):
+            print("template not found: %s" % tpl)
+            return 2
+        if os.path.isdir(dd):
+            shutil.rmtree(dd)
+        shutil.copytree(tpl, dd)
+        print("cloned CZ_TEMPLATE -> %s" % os.path.basename(dd))
 
     print("\ndraft: %s" % dd)
     if a.stage in ("all", "foundation"):
@@ -79,7 +110,10 @@ def main(argv=None):
     if a.stage in ("all", "overlays"):
         print("\n-- overlays --")
         overlays.build(sp, dd, allow_uncached=a.allow_uncached)
-    print("\nbuilt. Now run, in order:")
+    # Provisional record. enforce_track_order is the LAST write and updates it again -
+    # without that, the next build would see its own track-ordered output as "edited".
+    draftio.record_build(dd, sp["name"])
+    print("\nbuilt. Now run, in order (track order updates the provenance record):")
     print("  python _state/enforce_track_order.py %s" % dd)
     print("  python _state/verify_build.py %s" % dd)
     print("  python _state/visual_gate.py %s --out gate.png    # and LOOK at it" % dd)

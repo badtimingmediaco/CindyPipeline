@@ -5,11 +5,27 @@ sample audio so nothing points at the machine it was authored on.
 
   python setup.py                          # default home: ~/Documents/CindyPipeline
   python setup.py --pipeline <dir>
-  python setup.py --force                  # re-copy kit files that already exist
+  python setup.py --force                  # re-copy the banks too, not just reference
 
-Idempotent and additive. It NEVER overwrites work the editor owns - their memes,
-their learnings, their drafts - unless --force is given, and even then it leaves
-01_intake / 05_output / _backups alone entirely.
+Safe to run on every upgrade, and that is the point: this is the second half of
+`claude plugin update`. Updating the plugin refreshes the CACHE; only this puts the new
+code and the new reference content into the pipeline folder the editor works in.
+
+It splits what it copies in two, because the two halves have opposite failure modes:
+
+  REFERENCE (kit/state -> _state)  always refreshed. Engine code, the meme catalog, the
+      SFX map, the sticker kit, the brand bible, the learnings. Nobody customises these;
+      what happens instead is DRIFT, and a machine sitting on a six-week-old catalog
+      quietly produces worse videos than the one beside it. Version blueberry's audit
+      found exactly that - a checkout shipping a verify_build.py old enough to FAIL a
+      correct build, because code was being treated as user data and skipped when it
+      already existed.
+
+  BANKS (memes, logos, graphics, sfx)  additive. New kit files land; anything the editor
+      added stays. Their downloaded memes are theirs, and --force is the only way to
+      overwrite one.
+
+01_intake / 05_output / _backups / _runs are never touched, with or without --force.
 
 Deliberately does NOT put the pipeline in OneDrive or any synced folder: sync locks
 files mid-write and can fork a draft into a conflicted copy while CapCut has it open.
@@ -33,13 +49,17 @@ SKELETON = ["01_intake", "02_transcripts", "03_plans", "04_assets/graphics",
             "05_output", "_state/card_templates", "_state/learnings", "_backups",
             "_runs", "_sfx/Cindiezhu sfx"]
 
-# (source under kit/, destination under the pipeline home)
+# (source under kit/, destination under the pipeline home, always-refresh?)
+#
+# always-refresh=True means "this is reference, not content". See the module docstring:
+# the banks belong to the editor and are only ever added to; _state is the pipeline's own
+# knowledge and must never be allowed to drift behind the plugin that ships it.
 KIT_MAP = [
-    ("sfx",              "_sfx/Cindiezhu sfx"),
-    ("memes/bank",       "04_assets/memes/bank"),
-    ("logos",            "04_assets/logos"),
-    ("graphics",         "04_assets/graphics"),
-    ("state",            "_state"),
+    ("sfx",              "_sfx/Cindiezhu sfx",     False),
+    ("memes/bank",       "04_assets/memes/bank",   False),
+    ("logos",            "04_assets/logos",        False),
+    ("graphics",         "04_assets/graphics",     False),
+    ("state",            "_state",                 True),
 ]
 SCRIPTS = ["house_layout.py", "verify_build.py", "tenor_fetch.py", "post_session_fix.py",
            "enforce_track_order.py", "preview_composite.py", "doctor.py", "resolve_input.py",
@@ -176,13 +196,15 @@ def main():
 
     # 2 - kit ---------------------------------------------------------------
     say("\n2. Installing the kit")
-    for src, dst in KIT_MAP:
+    for src, dst, always in KIT_MAP:
         s = os.path.join(KIT, *src.split("/"))
         if not os.path.isdir(s):
             say(f"   [skip] kit/{src} not in this checkout")
             continue
-        new, kept = copy_tree(s, os.path.join(pipe, *dst.split("/")), args.force)
-        say(f"   {dst:28s} {new:3d} copied, {kept:3d} already present")
+        force = args.force or always
+        new, kept = copy_tree(s, os.path.join(pipe, *dst.split("/")), force)
+        verb = "refreshed" if force else "copied"
+        say(f"   {dst:28s} {new:3d} {verb}, {kept:3d} left alone")
 
     for f in SCRIPTS:
         s = os.path.join(HERE, f)

@@ -1,0 +1,364 @@
+{
+ "name": "ai_sandwich",
+ "draft": "CZ_AISandwich_20260825_v1",
+ "source": "01_intake/The AI Sandwich.mp4",
+ "end": 52.7,
+ "fps": 30,
+ "title": {
+  "end": 3.8,
+  "replace": {
+   "How to turn": "the best AI workflow is a",
+   "Claude": "double",
+   "into": "decker",
+   "5 Sub Agents": "Sandwich"
+  },
+  "gap_after": {
+   "into": "Claude"
+  },
+  "cta": {
+   "match": "Comment",
+   "t": [
+    48.88,
+    52.7
+   ],
+   "text": "Comment\n\"sandwich\""
+  }
+ },
+ "_title_why": "guide title option 1, 'The best AI workflow is a double-decker sandwich'. The paper row 'Sandwich' measures 728.6px of the 944.3px the donor allows (77%). gap_after places 'decker' at the template's own word gap rather than a constant, so the model's width bias cancels.",
+ "sfx_hits": [
+  [
+   0.0,
+   "magic reveal.MP3"
+  ],
+  [
+   3.1,
+   "kirarin glitter.MP3"
+  ],
+  [
+   48.88,
+   "UI Prompt.MP3"
+  ]
+ ],
+ "_sfx_why": "no Class A sound anywhere in this video - app scroll, click scroll, realistic typing and the mouse sounds each promise a screen recording, and there is none in this cut.",
+ "beats": [
+  {
+   "kind": "gfx",
+   "t": [
+    1.1,
+    3.3
+   ],
+   "band": "title",
+   "asset": "bank/patrick_building_workbench.mp4",
+   "sfx": "POP UI Sound.MP3",
+   "why": "'AI can build pretty much anything now'. Lower band so it clears the title, which holds until 3.80."
+  },
+  {
+   "kind": "meme",
+   "t": [
+    3.9,
+    4.98
+   ],
+   "asset": "bank/confused_math_lady.mp4",
+   "label": "Why so average?",
+   "sfx": "peep.MP3"
+  },
+  {
+   "kind": "meme",
+   "t": [
+    5.02,
+    6.1
+   ],
+   "asset": "bank/michael_scott_grimace.mp4",
+   "label": "Painfully average",
+   "sfx": "error.MP3",
+   "why": "error is Class C and lands on 'painfully average' (5.04)."
+  },
+  {
+   "kind": "text",
+   "t": [
+    6.4,
+    8.3
+   ],
+   "text": "Generate and recommend",
+   "band": "lower",
+   "sfx": "pop motion.MP3"
+  },
+  {
+   "kind": "meme",
+   "t": [
+    8.36,
+    9.28
+   ],
+   "asset": "bank/skeptical_kid_sideeye.mp4",
+   "sfx": "peep.MP3",
+   "why": "'but it should never be' - the side-eye lands before the judging verdict at 9.32, so the two read as reaction then ruling."
+  },
+  {
+   "kind": "meme",
+   "t": [
+    9.32,
+    10.12
+   ],
+   "asset": "bank/simpsons_judges_scorecards.mp4",
+   "label": "Never the final judge",
+   "sfx": "error.MP3",
+   "why": "on 'the final judge' (9.32 final / 9.60 judge). Window sized to the clip's real 0.8s so the trim leaves no hole."
+  },
+  {
+   "kind": "card",
+   "t": [
+    10.24,
+    12.8
+   ],
+   "asset": "gfx/sw_criteria.png",
+   "label": "Not AI's call",
+   "sfx": "POP UI Sound.MP3",
+   "why": "she lists four criteria in 2.3s - too fast to split into four cards without each reading as a flicker, and they are meant to be taken in as a set."
+  },
+  {
+   "kind": "meme",
+   "t": [
+    12.88,
+    14.48
+   ],
+   "asset": "bank/chef_tasting_sauce.mp4",
+   "label": "Taste and judgment",
+   "sfx": "bulb sound.MP3",
+   "why": "the ACTION is tasting to judge. bulb is the realisation."
+  },
+  {
+   "kind": "text",
+   "t": [
+    14.9,
+    17.9
+   ],
+   "text": "The 2026 skill",
+   "band": "lower",
+   "sfx": "tring.MP3"
+  },
+  {
+   "kind": "text",
+   "t": [
+    18.34,
+    20.4
+   ],
+   "text": "Here's how to train it",
+   "band": "lower",
+   "sfx": "ascending whistles.MP3"
+  },
+  {
+   "kind": "card",
+   "t": [
+    20.58,
+    22.4
+   ],
+   "asset": "gfx/sw_deck_2.png",
+   "label": "The AI Sandwich",
+   "sfx": "magic reveal.MP3",
+   "why": "the hero concept reveal, on 'the concept is called the AI sandwich'. No annotation: box_red's ink is 3.2:1 and a full-width card row is 16.7:1, so fitting the width scaled the box 5x too tall and it covered the whole card."
+  },
+  {
+   "kind": "card",
+   "t": [
+    22.5,
+    24.36
+   ],
+   "asset": "gfx/sw_deck_3.png",
+   "label": "Make it triple-decker",
+   "sfx": "POP UI Sound.MP3"
+  },
+  {
+   "kind": "card",
+   "t": [
+    24.46,
+    25.6
+   ],
+   "asset": "gfx/sw_deck_50.png",
+   "label": "Or 50-decker",
+   "sfx": "kirarin glitter.MP3",
+   "why": "drawn rather than sourced - the three tall-sandwich clips Tenor returned were a stock ad, a clip with burned text, and a cartoon lobster."
+  },
+  {
+   "kind": "card",
+   "t": [
+    25.7,
+    27.6
+   ],
+   "asset": "gfx/sw_loop_1.png",
+   "label": "You set the standard",
+   "sfx": "answer right.MP3",
+   "why": "beats 13-16 are the guide's beats 5-8, one card per clause: You set / AI builds / You check / AI revises."
+  },
+  {
+   "kind": "card",
+   "t": [
+    27.68,
+    28.6
+   ],
+   "asset": "gfx/sw_loop_2.png",
+   "sfx": "pop motion.MP3"
+  },
+  {
+   "kind": "card",
+   "t": [
+    28.66,
+    29.4
+   ],
+   "asset": "gfx/sw_loop_3.png",
+   "sfx": "answer right.MP3"
+  },
+  {
+   "kind": "card",
+   "t": [
+    29.44,
+    30.8
+   ],
+   "asset": "gfx/sw_loop_4.png",
+   "sfx": "pop motion.MP3"
+  },
+  {
+   "kind": "text",
+   "t": [
+    30.9,
+    33.2
+   ],
+   "text": "Keep sandwiching yourself in",
+   "band": "lower",
+   "sfx": "POP UI Sound.MP3",
+   "why": "left long on purpose - the engine wraps and scales a paper label to fit."
+  },
+  {
+   "kind": "meme",
+   "t": [
+    33.3,
+    35.0
+   ],
+   "asset": "bank/magician_poof_vanish.mp4",
+   "label": "Remove yourself",
+   "sfx": "magic reveal.MP3",
+   "why": "'remove yourself from the equation' (33.72 remove). The ACTION is vanishing."
+  },
+  {
+   "kind": "card",
+   "t": [
+    35.16,
+    38.2
+   ],
+   "asset": "gfx/sw_course.png",
+   "label": "Pull it back on course",
+   "label_t": [
+    35.16,
+    37.2
+   ],
+   "sfx": "bulb sound.MP3",
+   "why": "carries the beat because all three dog-on-a-leash candidates had burned text or a watermark. No annotation: same aspect mismatch - the correction region is 8.9:1 against circle_sign's 1.3:1, so the circle swallowed the caption."
+  },
+  {
+   "kind": "text",
+   "t": [
+    38.32,
+    39.7
+   ],
+   "text": "Repeated corrections become:",
+   "band": "lower",
+   "sfx": "tring.MP3",
+   "why": "left long on purpose - the engine wraps and scales a paper label to fit."
+  },
+  {
+   "kind": "text",
+   "t": [
+    39.76,
+    40.7
+   ],
+   "text": "Rules",
+   "band": "lower",
+   "sfx": "pop motion.MP3",
+   "why": "five rapid labels on her five spoken items - pop is the sound for rapid succession."
+  },
+  {
+   "kind": "text",
+   "t": [
+    40.76,
+    41.46
+   ],
+   "text": "Examples",
+   "band": "lower",
+   "sfx": "pop motion.MP3"
+  },
+  {
+   "kind": "text",
+   "t": [
+    41.52,
+    41.94
+   ],
+   "text": "Skills",
+   "band": "lower",
+   "sfx": "pop motion.MP3"
+  },
+  {
+   "kind": "text",
+   "t": [
+    42.0,
+    42.8
+   ],
+   "text": "Approval gates",
+   "band": "lower",
+   "sfx": "pop motion.MP3"
+  },
+  {
+   "kind": "text",
+   "t": [
+    42.86,
+    43.36
+   ],
+   "text": "Evals",
+   "band": "lower",
+   "sfx": "pop motion.MP3",
+   "why": "whisper heard 'eviles' at 42.86 - it is 'evals'. On the caption fix list."
+  },
+  {
+   "kind": "card",
+   "t": [
+    43.42,
+    44.42
+   ],
+   "asset": "gfx/sw_eval.png",
+   "sfx": "answer right.MP3",
+   "why": "no label - the card already reads 'eval = a repeatable test', which is the guide's own overlay text."
+  },
+  {
+   "kind": "card",
+   "t": [
+    44.5,
+    46.3
+   ],
+   "asset": "gfx/sw_autonomy.png",
+   "label": "Progressive autonomy",
+   "sfx": "magic reveal.MP3",
+   "annotate": [
+    {
+     "mark": "circle_sign",
+     "region": "bar_4",
+     "pad": 1.25,
+     "t": [
+      45.6,
+      46.3
+     ],
+     "sfx": "pop motion.MP3"
+    }
+   ]
+  },
+  {
+   "kind": "meme",
+   "t": [
+    46.4,
+    48.6
+   ],
+   "asset": "bank/chains_breaking_silhouette.mp4",
+   "label": "Earns more freedom",
+   "sfx": "ascending whistles.MP3",
+   "why": "'earns more freedom on a task' (47.72 freedom)."
+  }
+ ],
+ "_dropped_sw_split": "collided with the CTA once cards moved into the raised band (card y 0.202-0.677 against CTA 0.441-0.601). At the end of a reel the CTA should own the screen - a two-column card splits attention exactly where you want one action."
+}

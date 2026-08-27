@@ -44,22 +44,35 @@ installed program yet, and a second run clears them.
 
 </details>
 
-### Then
+The installer also builds your pipeline folder, finds your CapCut drafts folder wherever
+it is, and places the house template. It tells you if anything is still missing.
 
-**1.** Open a new terminal, run `claude`, and type:
+### Then — one manual step
 
+Open `CZ_TEMPLATE` in CapCut once, **while online**, then close it. CapCut downloads its
+own fonts and the torn-paper effect at that moment. Nobody can automate this part — those
+files live inside CapCut, not on disk.
+
+Then open a new terminal and run `claude`. That's it. You're ready to build.
+
+## Updating
+
+**Same one line.** It is safe to re-run, and it is how you get every update:
+
+```powershell
+irm https://raw.githubusercontent.com/badtimingmediaco/CindyPipeline/main/install.ps1 | iex
 ```
-/reel-factory:reel-setup
-```
 
-That builds your pipeline folder, finds your CapCut drafts folder wherever it is, and
-places the house template. It tells you if anything is still missing.
+Close CapCut first, then paste it. It pulls the new plugin *and* refreshes your pipeline
+folder — the engine code, the meme catalog, the SFX map and the accumulated learnings all
+live in `Documents\CindyPipeline`, and a plugin update on its own does not touch them.
+Your own memes, logos and drafts are left exactly as they are.
 
-**2.** Open `CZ_TEMPLATE` in CapCut once, **while online**, then close it. CapCut downloads
-its own fonts and the torn-paper effect at that moment. Nobody can automate this part —
-those files live inside CapCut, not on disk.
+Then **open a new terminal** and run `claude`. A session that was already running is still
+on the old version — Claude Code reads the plugin when it starts.
 
-That's it. You're ready to build.
+Claude tells you at the start of a session when a newer version exists, so you do not have
+to check.
 
 ### Two different prompts — this trips everyone up
 
@@ -188,7 +201,8 @@ skills/reel-factory/    the spec — a router plus reference files loaded on dem
 commands/               /reel-factory:reel-setup, /reel-factory:reel-run, /reel-factory:reel-learn
 scripts/                doctor, setup, fuzzy input matching, placement laws,
                         verification, Tenor sourcing, post-session repair
-kit/                    SFX bank (23), meme bank (37), logos, graphics,
+examples/               two real specs to read before you write your own
+kit/                    SFX bank (23), meme bank (41), logos, graphics,
                         CZ_TEMPLATE, donor JSONs, the 43-sticker annotation kit,
                         the brand bible and the accumulated learnings
 ```

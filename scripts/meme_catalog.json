@@ -314,6 +314,19 @@
     "a clean slate"
    ],
    "why_chosen": "'the old context vanishes' - the ACTION is vanishing. This is the clip that replaces roxbury_bouncer_denied, which was matched to the word 'denied' rather than to what the sentence means. Rejected along the way: a POOF-lettered cartoon and two whiteboard clips, all carrying burned text or a service watermark."
+  },
+  "chef_tasting_sauce": {
+   "use": "ok",
+   "depicts": "chef in whites tasting a sauce from a wooden spoon, considering it",
+   "good_for": [
+    "taste",
+    "judgment",
+    "deciding if it is good enough",
+    "a standard"
+   ],
+   "duration_s": 1.6,
+   "why_chosen": "the beat is 'that's up to your taste and judgment' - the ACTION is tasting to judge. Chosen over a toddler-in-a-chef-hat cut because at 498x498 it DOWNSCALES into the 430px band (sharp), where the 640x320 alternative would have been width-driven to 844px and upscaled 1.32x.",
+   "rejected_alongside": "a Gordon Ramsay cut carrying burned 'I'm very disappointed'."
   }
  },
  "banned_wrong_mapping": {

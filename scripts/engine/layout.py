@@ -120,3 +120,27 @@ def text_y(band, last_label_y):
     if band == "title":
         return TITLE_BAND_Y
     return LOWER_TEXT_Y
+
+# How far a mark sits OUTSIDE the thing it marks, as a multiple of the region's width.
+#
+# Measured off the 2026-08-26 hand-finish: she rescaled the circle on the scoring card
+# from 0.2986 to 0.7466 - exactly 2.5x. Its ink landed at 657x521px against a 202x68px
+# target, i.e. 3.25x the region width, and its centre sat within 11px of the region's
+# centre. So the TARGET was right and the SIZE was wrong: a hand-drawn circle that hugs
+# its subject reads as a box. It is allowed to run off frame - hers ends at x=1229.
+MARK_PAD = {
+    "circle": 3.2,
+    "circle_sign": 3.2,
+    "highlight_box": 1.10,
+    "dashed_box": 1.15,
+    "box_red": 1.18,
+    "underline": 1.00,
+    "arrow": 1.00,
+    "arrow_hand": 1.00,
+    "cross_x": 1.60,
+    "check_green": 1.60,
+}
+
+
+def mark_pad(mark, default=1.18):
+    return MARK_PAD.get(mark, default)

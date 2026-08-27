@@ -15,6 +15,11 @@ import os
 
 from . import capcutcli, draftio, layout as HL, materials, measure, paths
 
+# A plain title row may be any width so long as it stays on frame, with the same 25px
+# safety margin the visual gate uses - the width model is an estimate even after the
+# stroke and shadow corrections, so bias toward failing.
+FRAME_SAFE = 1030.0
+
 
 def text_of(mat):
     try:
@@ -54,60 +59,68 @@ def build(sp, draft, verbose=True):
         t = tpls.get(mid)
         return texts.get(t["text_info_resources"][0]["text_material_id"]) if t else None
 
-    # ---- 2a. WIDTH GATE. Measure every replacement against the row it replaces, BEFORE
-    #          writing anything. A torn-paper row does not grow to fit its text.
+    # ---- 2a. index the title rows FIRST. The width gate needs each row's SEGMENT, not
+    # just its material, because the rendered width depends on the segment's scale.
+    gap_after = title.get("gap_after") or {}
+    rowinfo = {}
+    for tr in d["tracks"]:
+        for s in tr["segments"]:
+            if s["target_timerange"]["start"] / 1e6 >= title_end + 0.1:
+                continue
+            mid = s["material_id"]
+            mat = texts.get(mid) or tpl_child(mid)
+            if mat is None:
+                continue
+            rowinfo[text_of(mat).strip()] = (mat, s, mid in tpls)
+
+    # ---- 2b. WIDTH GATE. Measure every replacement BEFORE writing anything.
+    #
+    # Two different questions, needing two different measurements:
+    #
+    #   TORN-PAPER row - "does it still fit the graphic?" A RATIO against the donor
+    #     string, which measure.fits_donor answers. The absolute figure it returns carries
+    #     the template's internal 2.44x multiplier, harmless in a ratio because it appears
+    #     on both sides and cancels.
+    #
+    #   PLAIN row      - "does it stay on frame?" An ABSOLUTE, which must be measured with
+    #     the segment's own scale and WITHOUT the template multiplier. Using fits_donor's
+    #     number here inflated every plain row 2.44x and rejected a title that really
+    #     renders at 676px as "1457px, runs off frame". A gate that cries wolf gets
+    #     switched off, so this distinction matters as much as the check does.
     problems = []
     for old, new in replace.items():
-        mat = None
-        for _mid, m in texts.items():
-            if text_of(m).strip() == old:
-                mat = m
-                break
-        if mat is None:
+        info = rowinfo.get(old)
+        if info is None:
             problems.append("title row %r not found in the template" % old)
             continue
-        is_child = any(tpl_child(tid) is mat for tid in tpls)
+        mat, seg, is_child = info
+        sc = seg["clip"]["scale"]["x"]
         try:
-            ok, npx, opx, ratio = measure.fits_donor(mat, new)
+            fp, size = measure.style_font(mat)
+            if is_child:
+                ok, npx, opx, ratio = measure.fits_donor(mat, new)
+                flag = "ok" if ok else "OVERFLOW - the paper does not grow"
+            else:
+                npx = measure.rendered_width_px(fp, new, size, sc, False)
+                opx = measure.rendered_width_px(fp, old, size, sc, False)
+                ratio = npx / opx if opx else 0.0
+                ok = npx <= FRAME_SAFE
+                flag = "on frame" if ok else "OFF FRAME"
         except RuntimeError as e:
             problems.append("%r -> %r: %s" % (old, new, e))
             continue
-        # Only a TEMPLATE CHILD is width-constrained: the torn-paper graphic is authored
-        # for the donor string and does not grow. A plain text row may be any width as
-        # long as it stays on-frame, so calling it "overflow" would be a false alarm - and
-        # a gate that cries wolf gets switched off.
-        if is_child:
-            flag = "ok " if ok else "OVERFLOW - paper does not grow"
-        else:
-            flag = "plain row, unconstrained" if not ok else "ok "
-        say("  width gate %-16r -> %-16r %7.1fpx vs %7.1fpx  (%3.0f%%) %s"
-            % (old, new, npx, opx, ratio * 100, flag))
+        say("  width gate %-27r -> %-27r %7.1fpx  %s" % (old, new, npx, flag))
         if not ok and is_child:
             problems.append(
                 "%r -> %r overflows its torn-paper row: %.1fpx of %.1fpx available "
                 "(%.0f%%). Choose a shorter phrase - the graphic does not grow."
                 % (old, new, npx, opx, ratio * 100))
-        if not is_child and npx > 1040:
-            problems.append("%r -> %r is %.0fpx wide and will run off a 1080px frame"
-                            % (old, new, npx))
+        if not ok and not is_child:
+            problems.append(
+                "%r -> %r renders %.0fpx wide and will run off the 1080px frame "
+                "(safe width %.0fpx)" % (old, new, npx, FRAME_SAFE))
     if problems:
         raise SystemExit("TITLE REJECTED before any write:\n  - " + "\n  - ".join(problems))
-
-    # ---- 2b. index the title rows, so a row can be placed relative to its neighbour.
-    # gap_after names a RELATIONSHIP ("catch" sits after "Claude"); the gap itself is a
-    # house constant in layout.py, and the arithmetic happens here.
-    gap_after = title.get("gap_after") or {}
-    rowinfo = {}
-    if gap_after:
-        for tr in d["tracks"]:
-            for s in tr["segments"]:
-                if s["target_timerange"]["start"] / 1e6 >= title_end + 0.1:
-                    continue
-                mid = s["material_id"]
-                mat = texts.get(mid) or tpl_child(mid)
-                if mat is None:
-                    continue
-                rowinfo[text_of(mat).strip()] = (mat, s, mid in tpls)
 
     stripped = retimed = retexted = moved = 0
     for tr in d["tracks"]:

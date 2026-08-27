@@ -94,3 +94,27 @@ preview tiles caused three correctly-centred cards to be reported as off-frame a
 "bleeding off the edge" when every one of them sat at x=0.000.
 
 **Verify layout numerically, or at full resolution. Never by eye from a thumbnail.**
+
+---
+
+## 7. MARKS - THE ARTWORK IS NOT ALWAYS THE MARK
+
+A hand-drawn mark (circle, box, arrow, tick) is placed by fitting it to a **card region**,
+never to a coordinate. Two things go wrong, both shipped at least once:
+
+**The ink is not the mark.** `place_sticker_on()` fits a sticker's whole ink box to the
+target. That is correct only when the ink *is* the mark. The `circle` sticker is a small
+flat ellipse **with four arrows pointing at it from above** - fitting its whole ink to
+"9.4 / 10" rendered the ellipse far too small and sitting low. `engine/layout.DECORATED_MARKS`
+now refuses to auto-place those; use `circle_sign`, a plain hand-drawn oval, to encircle a
+value. Check the list before choosing a mark.
+
+**A mark that hugs its subject reads as a box.** Measured off the owner's hand-finish: she
+rescaled a circle on a scoring card by exactly 2.5x, landing at **3.25x the target
+region's width**, centred within 11px of it. So the *target* was right and the *size* was
+wrong. `engine/layout.MARK_PAD` carries the multiplier per mark (circle 3.2, box_red 1.18,
+underline 1.00). A mark is allowed to run off frame - hers ends at x=1229 on a 1080 canvas.
+
+**Check the aspect before you fit.** `box_red` is a 3.2:1 shape; fitting it to a 16.7:1
+text row made it 5.2x too tall. `solve_annotation()` guards this now, but the judgement is
+yours: a mark whose proportions fight the region is the wrong mark, not a scaling problem.

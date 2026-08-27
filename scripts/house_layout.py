@@ -57,10 +57,20 @@ def meme_geom(w, h, target_h=DEFAULT_H):
 
 # -------------------------------------------------------------- 2. CENTRE BAND
 CARD_Y = 0.04             # legacy centre anchor (measured 0.00/0.022/0.04/0.058)
-CARD_TOP = 0.31           # cards are TOP-anchored: their measured top edges were 0.28 /
-                          # 0.293 / 0.369. Centre-anchoring makes a short card sit lower
-                          # than a tall one, so a run of step cards jitters up and down.
-CARD_W = 1015.0           # the house screen-rec card width (measured 943-1103, mean ~1015)
+
+# THE CENTRE BAND IS RESERVED FOR HER SCREEN RECORDINGS. A drawn card sits ABOVE it.
+#
+# Measured off CZ_ClaudeReviewer_20260825_v3_round5 (2026-08-26 hand-finish): she moved
+# all four subagent cards to exactly the same place - top edge 0.3100 -> 0.6771, scale
+# 0.9398 -> 0.8598, displayed 1015x319 -> 929x300. Four identical moves is a law, not a
+# nudge, and the reason was explicit: "I will be placing screen recordings in the centre."
+# The old 0.31 top edge put every drawn card in the one band she needs kept clear.
+CARD_TOP = 0.6771         # top edge, measured off her hand-finish
+CARD_W = 929.0            # displayed width, measured off her hand-finish
+
+# Nothing the engine draws may hang below this - everything under it belongs to the screen
+# recordings she drops in afterwards. verify_build.py asserts it.
+SCREENREC_CEILING = 0.34
 CARD_LABEL_GAP = 0.085    # label centre sits this far ABOVE the card's top edge
 
 
@@ -132,6 +142,11 @@ ANNOTATE = {
     "cursor_hand":   "7606748857111694600",   # pointing-hand cursor
     "cross_x":       "7476487068781268277",   # red X - "don't do this"
     "check_green":   "7528726073790549301",   # green tick - "do this"
+    # White DASHED arrow, ink 140x25 (5.6:1). Harvested from her 2026-08-26
+    # hand-finish, where she used it at scale 2.126 pointing in from the right
+    # edge. The rest of this kit is red marker - this one is a quieter white
+    # pointer, for INDICATING something rather than correcting it.
+    "arrow_dashed_white": "7459434279869713725",
 }
 
 

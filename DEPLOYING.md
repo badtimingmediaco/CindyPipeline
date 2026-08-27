@@ -94,10 +94,30 @@ Bump the version whenever the change is worth an editor noticing — a new rule,
 default, a fixed bug that altered output. The version is what `plugin update` compares, so
 a push without a bump may not reach anyone.
 
-**Kit assets are copied into each editor's pipeline at setup, not symlinked.** So a new meme
-or SFX file reaches their plugin cache on update but not their working folder. They need
-`/reel-factory:reel-setup` again — it is additive and copies in anything new without
-touching their own work. Say so explicitly when you ship new assets.
+**The kit is copied into each editor's pipeline, not symlinked.** A plugin update refreshes
+their *cache*; the folder they actually build in is only updated when `setup.py` runs. Since
+5.2.0 `install.ps1` runs it for them, so re-pasting the install line is the whole update —
+they do not have to remember `/reel-factory:reel-setup`. Two halves, deliberately different:
+
+- **`kit/state` → `_state` is force-refreshed.** Engine code, meme catalog, SFX map,
+  sticker kit, brand bible, learnings. Nobody customises these; what happens instead is
+  drift, and a machine on a six-week-old catalog quietly builds worse videos than the one
+  beside it while reporting itself up to date.
+- **The banks are additive.** New memes, logos and SFX land; anything the editor added or
+  changed is left alone. `--force` is the only way to overwrite one of theirs.
+
+### Before you push: check for drift
+
+Fixes get made in the live pipeline first — mid-build, straight into `_state/`. Nothing
+carries them back here, and nothing announces when the two have parted. By 5.2.0 the gap
+had reached six engine modules, five scripts and three learning files.
+
+```bash
+python tools/sync_from_pipeline.py
+```
+
+Report only. `--apply` copies live → plugin; review the diff before committing. Run it as
+the first step of every release, not the last.
 
 ## What is deliberately NOT in here
 

@@ -376,6 +376,45 @@ def main(draft):
     else:
         print(f"  [INFO] no overlay held longer than {LONGLIVED_S}s")
 
+    # ---- the centre band belongs to her screen recordings ---------------------
+    # Measured 2026-08-26: she moved all four subagent cards out of the centre to top edge
+    # 0.6771, and said why - "I will be placing screen recordings in the centre". A card
+    # hanging below the ceiling is not a build failure (a tall card physically cannot clear
+    # it, and she left the 465px+ ones where they were) but it IS a split candidate.
+    import sys as _sys, os as _os
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    import house_layout as _HL
+    intruders = []
+    for tr in d["tracks"]:
+        if tr["type"] != "video" or (tr.get("name") or "") == "V1":
+            continue
+        for s2 in tr["segments"]:
+            m = vids_all.get(s2["material_id"]) or {}
+            path = m.get("path") or ""
+            if not path.lower().endswith(".png"):
+                continue                      # drawn cards only, not her footage
+            w, h = m.get("width") or 0, m.get("height") or 0
+            if not w or not h:
+                continue
+            fit = min(1080.0 / w, 1920.0 / h)
+            sc = (s2["clip"].get("scale") or {"x": 1})["x"]
+            dh = h * fit * sc
+            bottom = (s2["clip"]["transform"]["y"]) - (dh / 2) / 960.0
+            if bottom < _HL.SCREENREC_CEILING:
+                intruders.append((_os.path.basename(path), round(bottom, 3),
+                                  round(dh)))
+    if intruders:
+        print(f"  [INFO] {len(intruders)} drawn card(s) hang below the reserved centre "
+              f"(ceiling {_HL.SCREENREC_CEILING}) - a screen recording cannot be dropped "
+              f"under them. Split candidates: {sorted(set(intruders))[:6]}")
+    else:
+        print(f"  [INFO] every drawn card clears the reserved centre band")
+
+    # (The 22-char label warning that used to live here was removed on 2026-08-26.
+    # It measured the wrong thing: she keeps a 36-character line when it is PLAIN
+    # text at size 10, and shortens a 20-character one when it is a paper label.
+    # Fit is the constraint, not length, and the engine now fits labels itself.)
+
     segs_total = sum(len(t["segments"]) for t in d["tracks"])
     dur_s = (d.get("duration") or 0) / 1e6
     if dur_s:

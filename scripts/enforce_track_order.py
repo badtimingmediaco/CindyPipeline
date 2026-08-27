@@ -127,4 +127,18 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
-    print(json.dumps(enforce(sys.argv[1], "--dry-run" in sys.argv), indent=1))
+    dry = "--dry-run" in sys.argv
+    report = enforce(sys.argv[1], dry)
+
+    # This is the LAST write of a build, so this is the moment the draft becomes what the
+    # owner will open. Stamp its fingerprint here: a later build compares against it and
+    # refuses rather than overwriting hand edits. (2026-08-26 - nine rebuilds over a
+    # delivered draft destroyed a day of them, unrecoverably.)
+    if not dry:
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from engine import draftio
+            report["provenance_sha"] = draftio.record_build(sys.argv[1])[:16]
+        except Exception as e:
+            report["provenance_sha"] = "FAILED: %s" % e
+    print(json.dumps(report, indent=1))

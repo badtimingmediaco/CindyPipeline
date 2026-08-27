@@ -25,3 +25,50 @@
 - Scripted pairing audit before handoff: every visual start has a hit within ±0.15s;
   orphaned SFX deleted; SFX move together with retimed assets.
 
+---
+
+## 3B. WHAT AN SFX ACTUALLY MEANS (owner correction, 2026-08-25)
+
+An SFX is **not a mood**. It is either a description of on-screen action, or a generic
+accent for an asset entering. Three items in one review were wrong for the same reason:
+the sound described something the viewer was not being shown.
+
+### Class A - describes a screen recording that MUST exist
+
+Never place one of these unless the matching screen recording is actually on the timeline.
+
+| SFX | Means, literally |
+|---|---|
+| `app scroll.MP3` | a screen recording of **fast scrolling** |
+| `click scroll.MP3` | scrolling **with clicks** in a recording |
+| `computer mouse.MP3`, `pc mouse.MP3` | mouse interaction in a recording |
+| `realistic typing.MP3` | a recording of **typing** |
+
+Before placing any Class A sound, ask: *what recording is the viewer watching while this
+plays?* If the answer is "none", it is the wrong sound. A placeholder counts only if a
+real recording is going into it.
+
+### Class B - generic accents, safe on any asset entering
+
+| SFX | Use |
+|---|---|
+| `POP UI Sound.MP3`, `pop motion.MP3` | an asset popping in; short, so **good for rapid succession** |
+| `peep.MP3` | **pasting** ("paste this prompt"), and general asset entry |
+| a click sound | one deliberate action, and general asset entry |
+
+### Class C - semantic, matched to the words
+
+| SFX | Use |
+|---|---|
+| `error.MP3` | **"wrong"**, "won't work", "bad", "fails" |
+| `answer right.MP3`, `success.MP3` | correctness, a passing result |
+| `bulb sound.MP3` | a realisation |
+| `tring.MP3` | a beat or step marker |
+| `magic reveal.MP3`, `ascending whistles.MP3`, `kirarin glitter.MP3` | reveals and risers |
+
+**Class C lands on the WORD, not the clause.** An `error.MP3` placed at the start of the
+clause fired 1.7s before the word "wrong" and read as a random noise. Take the word start
+from `words.json`.
+
+These are reasons, not a lookup table. A sound not listed here is judged by the same
+question: is it describing an action on screen, accenting an entrance, or naming a word?

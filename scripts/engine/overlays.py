@@ -19,6 +19,9 @@ FRAME = 1.0 / 30.0
 
 MAX_GAP_FRAMES = 5.0
 
+# A paper label must render inside this, with the same margin the visual gate uses.
+FRAME_SAFE = 1030.0
+
 
 def close_gaps(beats, fps=30.0, max_gap_frames=MAX_GAP_FRAMES):
     """Butt adjacent overlays together when the gap is under 5 frames.
@@ -72,6 +75,12 @@ def _sfx_hits(beats, end, lead_ins):
     return [h for h in hits if h[1]]
 
 
+# Per-file duration caps, measured off her hand-finished drafts. POP UI Sound is 0.167s
+# (5 frames) in all SEVEN places she used it - identical to the millisecond - while the
+# engine was capping it at 1.20s like everything else and ringing it ~7x too long.
+SFX_MAX_DUR = {"POP UI Sound.MP3": 0.167}
+
+
 TAIL_OK = {"magic reveal.MP3", "ascending whistles.MP3", "jingle of time.MP3",
            "success.MP3", "special effect.MP3", "kirarin glitter.MP3"}
 
@@ -99,6 +108,7 @@ def place_sfx(draft, beats, end, lead_ins):
             dur = min(dur, max(0.30, nxt - t0 + 0.60))
         else:
             dur = min(dur, max(0.25, nxt - t0), 1.20)
+        dur = min(dur, SFX_MAX_DUR.get(f, dur))
         if dur <= 0.05:
             continue
         idx = next((i2 for i2, e in enumerate(ends) if e <= t0), None)
@@ -119,9 +129,9 @@ def solve_annotation(card_png, ann, seg_scale, seg_y, allow_uncached=False):
     against one revision of one card. Redraw the card and they point at nothing, silently.
     Here they are recomputed from the region manifest every build.
     """
-    cx, cy, w_px = measure.card_region_target(card_png, ann["region"], seg_scale, seg_y,
-                                              pad=ann.get("pad", 1.18),
-                                              place=ann.get("place", "on"))
+    cx, cy, w_px, h_px = measure.card_region_target(
+        card_png, ann["region"], seg_scale, seg_y,
+        pad=ann.get("pad", HL.mark_pad(ann["mark"])), place=ann.get("place", "on"))
     if ann["mark"] in HL.DECORATED_MARKS and not ann.get("i_know_its_decorated"):
         raise SystemExit(
             "annotation mark %r cannot be auto-placed: %s\nEither pick the undecorated "
@@ -138,6 +148,22 @@ def solve_annotation(card_png, ann, seg_scale, seg_y, allow_uncached=False):
                 "to fetch it, or re-run with --allow-uncached to place it blind."
                 % ann["mark"])
         return ann["mark"], ann.get("fallback_scale", 0.7), cx, cy
+    # ASPECT GUARD. place_sticker_on fits the mark's ink WIDTH to the region and keeps the
+    # mark's own aspect ratio. If the region is far wider-relative-to-tall than the mark,
+    # the mark comes out enormously too tall: box_red's ink is 3.2:1, a full-width card row
+    # is 16.7:1, and the result covered the entire card and ran off both edges. Refuse it
+    # rather than draw it, and say which mark would fit.
+    ink = measure.ink_box(art)
+    ink_aspect = (ink[2] - ink[0]) / float(max(1, ink[3] - ink[1]))
+    tgt_aspect = w_px / max(1.0, h_px)
+    if max(ink_aspect / tgt_aspect, tgt_aspect / ink_aspect) > 2.5:
+        raise SystemExit(
+            "annotation %r does not fit region %r: the mark's ink is %.1f:1 but the region "
+            "is %.1f:1, so fitting the width would scale the mark %.1fx too tall. Pick a "
+            "mark with a similar aspect (underline %s, box_red/dashed_box %s, circle_sign "
+            "%s), or annotate a more compact region."
+            % (ann["mark"], ann["region"], ink_aspect, tgt_aspect,
+               tgt_aspect / ink_aspect, "~9.5:1", "~3.2:1", "~1.3:1"))
     sc, x, y = measure.place_sticker_on(art, cx, cy, w_px)
     return ann["mark"], sc, x, y
 
@@ -187,25 +213,52 @@ def build(sp, draft, allow_uncached=False, verbose=True):
             lane_end[idx] = z
         b["lane"] = idx
     for b in media:
-        dur = b["t"][1] - b["t"][0]
+        want = b["t"][1] - b["t"][0]
         _, _, sdur = capcutcli.probe(b["path"])
-        if sdur is not None and dur > sdur + 1e-3:
-            say("  ! %s: window %.2fs > source %.2fs - trimmed"
-                % (os.path.basename(b["path"]), dur, sdur))
-            dur = sdur
-            b["t"] = [b["t"][0], round(b["t"][0] + dur, 4)]
+
+        # LOOP a short clip to fill its window; do not trim the window down to it.
+        #
+        # Trimming left a hole: a 0.80s clip in a 1.50s slot ended early and the next asset
+        # did not start yet. The owner solves this by hand - on the 2026-08-26 hand-finish
+        # she covered 2.367-3.400 with FOUR butted copies of a 0.533s clip, each restarting
+        # at source 0.000. So the clip repeats; the beat keeps the length the VO gave it.
+        #
+        # (She also sped that one 2x - 0.533s of source played in 0.266s. Speed is a taste
+        # decision about the clip and is left to her; looping is just arithmetic.)
+        spans = [(b["t"][0], want)]
+        if sdur is not None and want > sdur + 1e-3:
+            if b.get("loop", True) and sdur > 0.05:
+                spans, t0 = [], b["t"][0]
+                while t0 < b["t"][1] - 1e-3:
+                    seg_dur = min(sdur, b["t"][1] - t0)
+                    spans.append((t0, seg_dur))
+                    t0 += seg_dur
+                say("  looped %s x%d to fill %.2fs (source %.2fs)"
+                    % (os.path.basename(b["path"]), len(spans), want, sdur))
+            else:
+                say("  ! %s: window %.2fs > source %.2fs - trimmed"
+                    % (os.path.basename(b["path"]), want, sdur))
+                spans = [(b["t"][0], sdur)]
+                b["t"] = [b["t"][0], round(b["t"][0] + sdur, 4)]
+
         # SIX decimals, not three. A frame is 0.033333s; rounding a duration to the
         # nearest millisecond can push an asset up to 500us past the start of the next
         # one, which then reports as a spatial collision and, on screen, as the 1-5 frame
         # sliver the owner keeps catching. CapCut stores microseconds - give it what it stores.
-        r = capcutcli.cli("add-video", draft, b["path"].replace("\\", "/"),
-                          "%.6f" % b["t"][0], "%.6f" % dur,
-                          "--track-name", "gfx_%d" % b["lane"])
-        if not r.get("ok"):
-            say("  ! add-video failed", b["path"], r)
-            continue
-        b["seg_id"] = r["segment_id"]
-        b["src_w"], b["src_h"] = r["width"], r["height"]
+        b["seg_ids"] = []
+        for (t0, seg_dur) in spans:
+            if seg_dur <= 1e-3:
+                continue
+            r = capcutcli.cli("add-video", draft, b["path"].replace("\\", "/"),
+                              "%.6f" % t0, "%.6f" % seg_dur,
+                              "--track-name", "gfx_%d" % b["lane"])
+            if not r.get("ok"):
+                say("  ! add-video failed", b["path"], r)
+                continue
+            b["seg_ids"].append(r["segment_id"])
+            b["src_w"], b["src_h"] = r["width"], r["height"]
+        if b["seg_ids"]:
+            b["seg_id"] = b["seg_ids"][0]
     placed = sum(1 for b in beats if b.get("seg_id"))
     say("placed %d/%d media segments across %d lane(s)"
         % (placed, len(media), len(lane_end)))
@@ -231,15 +284,57 @@ def build(sp, draft, allow_uncached=False, verbose=True):
     last_label_y = 0.36
     n_logos = sum(1 for b in beats if b["kind"] == "logo")
 
+    def _wrap(t):
+        """Split a label onto two balanced lines at a space."""
+        words = t.split()
+        if len(words) < 2:
+            return None
+        best, bestdiff = None, 1e9
+        for i in range(1, len(words)):
+            l1, l2 = " ".join(words[:i]), " ".join(words[i:])
+            diff = abs(len(l1) - len(l2))
+            if diff < bestdiff:
+                best, bestdiff = (l1 + "\n" + l2), diff
+        return best
+
     def add_label(text, t_pair, y):
+        """Place a paper label, FITTING it to the frame the way she does by hand.
+
+        Measured 2026-08-26: faced with a label too wide for the frame she does one of
+        three things - shorten it, wrap it onto two lines, or scale the paper down. Her own
+        scales run 0.306 (long, two-line) to 0.383 (short), against the engine's fixed
+        0.37. So "make it fit" is the rule and the character count never was: she kept a
+        36-character line as plain text and cut a 20-character paper one.
+
+        Order matters. Wrapping keeps the type big and is what she reaches for first;
+        shrinking is the fallback when even two lines will not fit.
+        """
         # Clamp into the beat that owns it. close_gaps moves a beat's edges to the frame
         # grid; a label_t written by hand does not move with it, and a label that outlives
         # its card overlaps the next label.
         t_pair = [max(t_pair[0], beat_span[0]), min(t_pair[1], beat_span[1])]
-        seg, wpx = materials.clone_sticker(d, donor_seg, donor_tpl, text,
-                                           t_pair[0], t_pair[1], 0.0, y)
+
+        def place(txt, scale):
+            return materials.clone_sticker(d, donor_seg, donor_tpl, txt,
+                                           t_pair[0], t_pair[1], 0.0, y, scale=scale)
+
+        base = 0.37
+        seg, wpx = place(text, base)
+        final = text
+        if wpx * measure.PAPER_PAD > FRAME_SAFE and "\n" not in text:
+            wrapped = _wrap(text)
+            if wrapped:
+                seg2, wpx2 = place(wrapped, base)
+                if wpx2 < wpx:
+                    seg, wpx, final = seg2, wpx2, wrapped
+                    say("  label wrapped to two lines: %r" % text)
+        if wpx * measure.PAPER_PAD > FRAME_SAFE:
+            shrunk = round(base * FRAME_SAFE / (wpx * measure.PAPER_PAD), 4)
+            seg["clip"]["scale"] = {"x": shrunk, "y": shrunk}
+            wpx *= shrunk / base
+            say("  label scaled %.3f -> %.3f to fit: %r" % (base, shrunk, final))
         texts.append(seg)
-        widths.append((text, wpx))
+        widths.append((final, wpx))
 
     for b in beats:
         t_in, t_out = b["t"]
@@ -247,10 +342,13 @@ def build(sp, draft, allow_uncached=False, verbose=True):
         beat_span[:] = [t_in, t_out]
 
         if b.get("seg_id"):
-            s = by_id.get(b["seg_id"])
-            if s is None:
+            # Every LOOPED copy gets the same geometry - a clip repeated to fill its
+            # window must not change size or position halfway through it.
+            segs = [by_id[i] for i in b.get("seg_ids", [b["seg_id"]]) if i in by_id]
+            if not segs:
                 say("  ! placed segment vanished:", b["path"])
                 continue
+            s = segs[0]
             w, h = b["src_w"], b["src_h"]
             fit = min(1080.0 / w, 1920.0 / h)
 
@@ -260,19 +358,22 @@ def build(sp, draft, allow_uncached=False, verbose=True):
                 # filled 50.6% of its canvas and the other 100%.
                 sc = measure.optical_scale(b["path"])
                 x = HL.logo_slot(b.get("slot", "centre"), n_logos)
-                s["clip"]["scale"] = {"x": sc, "y": sc}
-                s["clip"]["transform"] = {"x": x, "y": HL.LOGO_Y}
+                for s2 in segs:
+                    s2["clip"]["scale"] = {"x": sc, "y": sc}
+                    s2["clip"]["transform"] = {"x": x, "y": HL.LOGO_Y}
                 b["disp"] = (round(w * fit * sc), round(h * fit * sc))
             else:
                 sc, cy, dh, ly = HL.media_geom(b["band"], w, h)
-                s["clip"]["scale"] = {"x": sc, "y": sc}
-                s["clip"]["transform"] = {"x": 0.0, "y": cy}
+                for s2 in segs:
+                    s2["clip"]["scale"] = {"x": sc, "y": sc}
+                    s2["clip"]["transform"] = {"x": 0.0, "y": cy}
                 last_label_y = ly
                 b["disp"] = (round(w * fit * sc), round(dh))
                 b["_geom"] = (sc, cy)
                 if b.get("label"):
                     add_label(b["label"], b.get("label_t", [t_in, t_out]), ly)
-            s["visible"] = True
+            for s2 in segs:
+                s2["visible"] = True
 
             for ann in (b.get("annotate") or []):
                 sc_g, cy_g = b.get("_geom", (1.0, 0.0))
@@ -337,10 +438,14 @@ def build(sp, draft, allow_uncached=False, verbose=True):
                 s2["volume"] = HL.V1_VOLUME
     draftio.save(draft, d)
 
-    over = [(t, round(w)) for t, w in widths if w > 980]
+    # The paper graphic runs ~1.40x its text box, so the raw label width is not
+    # what the viewer sees. Report the RENDERED width against the same frame-safe
+    # limit the visual gate uses.
+    over = [(t, round(w * measure.PAPER_PAD)) for t, w in widths
+            if w * measure.PAPER_PAD > 1030]
     say("garbage-collected %d orphan text material(s)" % ngc)
-    say("media on %d lane track(s) | %d text layers | widest row %.0fpx | over budget: %s"
-        % (nlane, len(texts), max([w for _, w in widths] or [0]), over or "none"))
+    say("media on %d lane track(s) | %d text layers | widest rendered row %.0fpx | over budget: %s"
+        % (nlane, len(texts), max([w * measure.PAPER_PAD for _, w in widths] or [0]), over or "none"))
     say("volume pass: V1 = %s, success.MP3 x%d = %s"
         % (HL.V1_VOLUME, nvol, HL.SUCCESS_VOLUME))
     return {"media": placed, "texts": len(texts), "annots": len(annots),
